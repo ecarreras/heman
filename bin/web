@@ -27,7 +27,7 @@ def web(addr, debug=True):
     port = int(port)
 
     app = create_app(DEBUG=debug)
-    app.run(host, port)
+    app.run(host, port, use_reloader=True)
 
 
 if __name__ == '__main__':

@@ -25,11 +25,13 @@ def create_app(**config):
         app.config['MONGO_URI'] = os.environ['MONGO_URI']
 
     app.config['LOG_LEVEL'] = 'DEBUG'
+    app.config['SECRET_KEY'] = '2205552d13b5431bb537732bbb051f1214414f5ab34d47'
 
     configure_logging(app)
     configure_sentry(app)
     configure_api(app)
     configure_mongodb(app)
+    configure_login(app)
 
     return app
 
@@ -59,5 +61,13 @@ def configure_mongodb(app):
 
 
 def configure_logging(app):
-    logging.basicConfig()
-    logging.getLogger().setLevel(getattr(logging, app.config['LOG_LEVEL']))
+    logging.basicConfig(level=getattr(logging, app.config['LOG_LEVEL']))
+
+
+def configure_login(app):
+    from heman.auth import login_manager, login
+    login_manager.init_app(app)
+
+    @app.teardown_request
+    def force_logout(*args, **kwargs):
+        login.logout_user()

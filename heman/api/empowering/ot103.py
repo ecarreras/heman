@@ -1,4 +1,4 @@
-from flask import current_app
+from flask import current_app, jsonify
 from amoniak.caching import OT103Caching
 
 from heman.config import mongo
@@ -14,3 +14,4 @@ class OT103(EmpoweringResource):
                 'No cached result for contract %s and period %s',
                 contract, period
             )
+        return jsonify(result)

@@ -1,13 +1,17 @@
 from __future__ import absolute_import
 
-from flask.ext.restful import Api, Resource
+from flask.ext import restful, login, cors
 
 
-class HemanAPI(Api):
+class HemanAPI(restful.Api):
     pass
 
 
-class ApiCatchall(Resource):
+class AuthorizedResource(restful.Resource):
+    method_decorators = [login.login_required, cors.cross_origin()]
+
+
+class ApiCatchall(restful.Resource):
     def get(self, path):
         return {'status': 404, 'message': 'Not Found'}, 404
 
