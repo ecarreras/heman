@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+
+from __future__ import absolute_import
+
+import argparse
+import sys
+
+
+def main(argv=sys.argv[1:]):
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--addr', default='localhost:5000')
+    parser.add_argument('--no-debug', dest='debug', action='store_false',
+                        default=True)
+
+    args = parser.parse_args(argv)
+
+    web(addr=args.addr, debug=args.debug)
+
+
+def web(addr, debug=True):
+    from heman.config import create_app
+
+    host, port = addr.split(':')
+    if not host:
+        host = '0.0.0.0'
+    port = int(port)
+
+    app = create_app(DEBUG=debug)
+    app.run(host, port)
+
+
+if __name__ == '__main__':
+    main()

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from amoniak.utils import setup_empowering_api
-from amoniak.amon import make_uuid
 
 
 class HeMan(object):
