@@ -2,7 +2,8 @@ from flask import current_app, jsonify
 from amoniak.caching import OT103Caching
 
 from heman.config import mongo
-from heman.api.empowering import service, EmpoweringResource
+from heman.api.empowering import service
+from heman.api.empowering.base import EmpoweringResource
 
 
 class OT103(EmpoweringResource):

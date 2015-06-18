@@ -39,10 +39,12 @@ def create_app(**config):
 def configure_api(app):
     """Configure API Endpoints.
     """
-    from heman.api.empowering.ot103 import OT103
+    from heman.api.empowering import resources as empowering_resources
     from heman.api import ApiCatchall
 
-    api.add_resource(OT103, '/OT103Results/<contract>/<period>')
+    # Add Empowering resources
+    for resource in empowering_resources:
+        api.add_resource(*resource)
     api.add_resource(ApiCatchall, '/<path:path>')
 
     api.init_app(app)
