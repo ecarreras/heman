@@ -10,12 +10,31 @@ from heman.api import HemanAPI
 
 
 api = HemanAPI(prefix='/api')
+"""API object
+"""
 sentry = Sentry(logging=True, level=logging.ERROR)
+"""Sentry object
+"""
 mongo = PyMongo()
+"""Access to database
+
+In other parts of the application you can do::
+
+    from heman.config import mongo
+
+    mongo.db.collection.find({"foo": "bar"})
+"""
 
 
 def create_app(**config):
-    """Create base application for HeMan.
+    """Application Factory
+
+    You can create a new He-Man application with::
+
+        from heman.config import create_app
+
+        app = create_app() # app can be uses as WSGI application
+        app.run() # Or you can run as a simple web server
     """
     app = Flask(
         __name__, static_folder=None
@@ -52,21 +71,34 @@ def configure_api(app):
 
 def configure_sentry(app):
     """Configure Sentry logger.
+
+    Uses `Raven
+    <http://raven.readthedocs.org/en/latest/integrations/flask.html>`_
     """
     sentry.init_app(app)
 
 
 def configure_mongodb(app):
     """Configure MongoDB access.
+
+    Uses `Flask-PyMongo <https://flask-pymongo.readthedocs.org/>`_
     """
     mongo.init_app(app)
 
 
 def configure_logging(app):
+    """Configure logging
+
+    Call ``logging.basicConfig()`` with the level ``LOG_LEVEL`` of application.
+    """
     logging.basicConfig(level=getattr(logging, app.config['LOG_LEVEL']))
 
 
 def configure_login(app):
+    """Configure login authentification
+
+    Uses `Flask-Login <https://flask-login.readthedocs.org>`_
+    """
     from heman.auth import login_manager, login
     login_manager.init_app(app)
 

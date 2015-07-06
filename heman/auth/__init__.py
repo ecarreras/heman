@@ -6,9 +6,15 @@ from heman.config import mongo
 
 
 login_manager = login.LoginManager()
+"""Login manager object
+"""
 
 
 class APIUser(login.UserMixin):
+    """API User object
+
+    :param token: token for this user
+    """
     def __init__(self, token):
         self.token = token
 

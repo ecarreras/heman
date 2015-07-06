@@ -4,6 +4,8 @@ from amoniak.utils import setup_empowering_api
 
 
 service = setup_empowering_api()
+"""Empowering service
+"""
 
 from heman.api.empowering.ot101 import OT101
 from heman.api.empowering.ot103 import OT103

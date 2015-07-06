@@ -8,6 +8,10 @@ class HemanAPI(restful.Api):
 
 
 class AuthorizedResource(restful.Resource):
+    """Autorized resource
+
+    Base resource to inherit if the resource must be protected with auth
+    """
     method_decorators = [login.login_required, cors.cross_origin()]
 
 
