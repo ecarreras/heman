@@ -15,14 +15,18 @@ class APIUser(login.UserMixin):
 
     :param token: token for this user
     """
-    def __init__(self, token):
-        self.token = token
+    def __init__(self, token, allowed):
+        self.id = token
+        self.allowed_contracts = allowed
 
     def is_authenticated(self):
         return True
 
     def get_id(self):
-        return self.token
+        return self.id
+
+    def allowed(self, contract):
+        return contract in self.allowed_contracts
 
 
 @login_manager.header_loader
@@ -31,9 +35,11 @@ def load_user_from_header(header_val):
     try:
         user, token = header_val.split()
         if user == 'token':
-            if mongo.db.tokens.find({'token': token}).count():
-                return APIUser(token)
-    except ValueError:
+            res = mongo.db.tokens.find({'token': token})
+            if res:
+                res = res[0]
+                return APIUser(res['token'], res.get('allowed_contracts', []))
+    except Exception:
         return None
 
 
