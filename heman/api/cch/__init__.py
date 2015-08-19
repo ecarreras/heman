@@ -47,5 +47,5 @@ class CCHFact(CCHResource):
         return Response(json.dumps(res), mimetype='application/json')
 
 resources = [
-    (CCHFact, 'CCHFact/<cups>/<period>')
+    (CCHFact, '/CCHFact/<cups>/<period>')
 ]
