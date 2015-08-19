@@ -25,8 +25,8 @@ class APIUser(login.UserMixin):
     def get_id(self):
         return self.id
 
-    def allowed(self, contract):
-        return contract in self.allowed_contracts
+    def allowed(self, value, key='name'):
+        return value in [x[key] for x in self.allowed_contracts]
 
 
 @login_manager.header_loader
