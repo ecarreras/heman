@@ -40,7 +40,7 @@ class CCHFact(CCHResource):
             interval = 12
         end = datetime.strptime(period, '%Y%m') + relativedelta(month=1)
         start = end - relativedelta(months=interval)
-        res = mongo.db['tg_cchcons'].find({
+        res = mongo.db['tg_cchfact'].find({
             'name': cups,
             'datetime': {'$gte': start, '$lt': end}
         }, fields={'_id': False, 'datetime': True, 'ai': True})
