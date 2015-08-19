@@ -2,6 +2,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from functools import wraps
 import json
+import time
 
 from flask import current_app, jsonify, request, Response
 from flask.ext.login import current_user
@@ -38,13 +39,20 @@ class CCHFact(CCHResource):
             interval = max(min(int(interval), 12), 1)
         except:
             interval = 12
-        end = datetime.strptime(period, '%Y%m') + relativedelta(month=1)
+        end = datetime.strptime(period, '%Y%m') + relativedelta(months=1)
         start = end - relativedelta(months=interval)
-        res = mongo.db['tg_cchfact'].find({
+        res = []
+        current_app.logger.debug('CCH from {} to {}'.format(start, end))
+        cursor = mongo.db['tg_cchfact'].find({
             'name': cups,
             'datetime': {'$gte': start, '$lt': end}
         }, fields={'_id': False, 'datetime': True, 'ai': True})
-        return Response(json.dumps(list(res)), mimetype='application/json')
+        for item in cursor:
+            res.append({
+                'date': time.mktime(item['datetime'].timetuple()) * 1000,
+                'value': item['ai']
+            })
+        return Response(json.dumps(res), mimetype='application/json')
 
 resources = [
     (CCHFact, '/CCHFact/<cups>/<period>')
