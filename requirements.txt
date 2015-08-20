@@ -4,4 +4,3 @@ flask-pymongo
 flask-restful>=0.3.1,<0.4.0
 raven<5.2.0
 blinker
-pytz
