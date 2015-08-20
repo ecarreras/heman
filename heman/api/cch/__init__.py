@@ -3,6 +3,7 @@ from dateutil.relativedelta import relativedelta
 from functools import wraps
 import json
 import time
+import pytz
 
 from flask import current_app, jsonify, request, Response
 from flask.ext.login import current_user
@@ -47,9 +48,13 @@ class CCHFact(CCHResource):
             'name': cups,
             'datetime': {'$gte': start, '$lt': end}
         }, fields={'_id': False, 'datetime': True, 'ai': True})
+        # Forcing local timezone
+        # TODO: Let config to force or not timezone
+        tz = pytz.timezone('Europe/Madrid')
         for item in cursor:
+            ts = time.mktime(item['datetime'].astimezone(tz).timetuple())
             res.append({
-                'date': time.mktime(item['datetime'].timetuple()) * 1000,
+                'date': ts * 1000,
                 'value': item['ai']
             })
         return Response(json.dumps(res), mimetype='application/json')
