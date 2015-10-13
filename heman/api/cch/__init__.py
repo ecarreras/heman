@@ -6,6 +6,7 @@ import time
 
 from flask import current_app, jsonify, request, Response
 from flask.ext.login import current_user
+from flask.ext.pymongo import ASCENDING
 
 from heman.api import AuthorizedResource
 from heman.config import mongo
@@ -46,7 +47,9 @@ class CCHFact(CCHResource):
         cursor = mongo.db['tg_cchfact'].find({
             'name': cups,
             'datetime': {'$gte': start, '$lt': end}
-        }, fields={'_id': False, 'datetime': True, 'ai': True})
+        }, fields={'_id': False, 'datetime': True, 'ai': True}).sort(
+            'datetime', ASCENDING
+        )
         # Forcing local timezone
 
         for item in cursor:
