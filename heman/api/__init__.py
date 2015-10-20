@@ -25,7 +25,7 @@ class AuthorizedResource(BaseResource):
 
 class ApiCatchall(BaseResource):
     def get(self, path):
-        return {'status': 404, 'message': 'Not Found'}, 404
+        return jsonify({'status': 404, 'message': 'Not Found'}), 404
 
     post = get
     put = get

@@ -1,6 +1,6 @@
 import json
 
-from flask import request, Response
+from flask import request, Response, jsonify
 
 from heman.api import AuthorizedResource
 from heman.auth import check_cups_allowed, check_contract_allowed
@@ -109,12 +109,19 @@ class EmpoweringBuildingForm(FormResource, AuthorizedByCupsResource):
 
     def post(self, cups):
         model = peek.model('empowering.cups.building')
-        cups_ids = model.search([('cups_id.name', '=', cups)])
-        if not cups_ids:
-            return {'status': 404, 'message': 'Not Found'}, 404
+        building_ids = model.search([('cups_id.name', '=', cups)])
         data = request.json
-        model.write([cups_ids], data)
-        return {'status': 200, 'message': 'OK'}, 200
+        if not building_ids:
+            cups = peek.model('giscedata.cups.ps').search([
+                ('name', '=', cups)
+            ])
+            if not cups:
+                return jsonify({'status': 404, 'message': 'Not Found'}), 404
+            data['cups_id'] = cups[0]
+            model.create(data)
+        else:
+            model.write([building_ids], data)
+        return jsonify({'status': 200, 'message': 'OK'}), 200
 
 
 class EmpoweringProfileDefForm(FormResource):
