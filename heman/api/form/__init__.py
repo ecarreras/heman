@@ -120,7 +120,7 @@ class EmpoweringBuildingForm(FormResource, AuthorizedByCupsResource):
             data['cups_id'] = cups[0]
             model.create(data)
         else:
-            model.write([building_ids], data)
+            model.write(building_ids, data)
         return jsonify({'status': 200, 'message': 'OK'}), 200
 
 
