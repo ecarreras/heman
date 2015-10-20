@@ -1,27 +1,14 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from functools import wraps
 import json
 import time
 
 from flask import current_app, jsonify, request, Response
-from flask.ext.login import current_user
 from flask.ext.pymongo import ASCENDING
 
 from heman.api import AuthorizedResource
+from heman.auth import check_cups_allowed
 from heman.config import mongo
-
-
-def check_cups_allowed(func):
-
-    @wraps(func)
-    def decorator(*args, **kwargs):
-        cups = kwargs.get('cups')
-        if (cups and current_user.is_authenticated()
-                and not current_user.allowed(cups, 'cups')):
-            return current_app.login_manager.unauthorized()
-        return func(*args, **kwargs)
-    return decorator
 
 
 class CCHResource(AuthorizedResource):

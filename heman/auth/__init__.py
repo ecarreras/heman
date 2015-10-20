@@ -1,6 +1,9 @@
 from __future__ import absolute_import
+from functools import wraps
 
+from flask import current_app
 from flask.ext import login
+from flask.ext.login import current_user
 
 from heman.config import mongo
 
@@ -8,6 +11,32 @@ from heman.config import mongo
 login_manager = login.LoginManager()
 """Login manager object
 """
+
+
+def check_contract_allowed(func):
+    """Check if Contract is allowed by token
+    """
+    @wraps(func)
+    def decorator(*args, **kwargs):
+        contract = kwargs.get('contract')
+        if (contract and current_user.is_authenticated()
+                and not current_user.allowed(contract)):
+            return current_app.login_manager.unauthorized()
+        return func(*args, **kwargs)
+    return decorator
+
+
+def check_cups_allowed(func):
+    """Check if CUPS is allowd by token
+    """
+    @wraps(func)
+    def decorator(*args, **kwargs):
+        cups = kwargs.get('cups')
+        if (cups and current_user.is_authenticated()
+                and not current_user.allowed(cups, 'cups')):
+            return current_app.login_manager.unauthorized()
+        return func(*args, **kwargs)
+    return decorator
 
 
 class APIUser(login.UserMixin):

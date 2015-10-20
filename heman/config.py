@@ -7,6 +7,7 @@ from flask.ext.pymongo import PyMongo
 from raven.contrib.flask import Sentry
 
 from heman.api import HemanAPI
+from amoniak.utils import setup_peek
 
 
 api = HemanAPI(prefix='/api')
@@ -23,6 +24,10 @@ In other parts of the application you can do::
     from heman.config import mongo
 
     mongo.db.collection.find({"foo": "bar"})
+"""
+
+peek = setup_peek()
+"""ERP Backend configuration
 """
 
 
@@ -60,6 +65,7 @@ def configure_api(app):
     """
     from heman.api.empowering import resources as empowering_resources
     from heman.api.cch import resources as cch_resources
+    from heman.api.form import resources as form_resources
     from heman.api import ApiCatchall
 
     # Add Empowering resources
@@ -68,6 +74,10 @@ def configure_api(app):
 
     # Add CCHFact resources
     for resource in cch_resources:
+        api.add_resource(*resource)
+
+    # Add Form resources
+    for resource in form_resources:
         api.add_resource(*resource)
 
     api.add_resource(ApiCatchall, '/<path:path>')
