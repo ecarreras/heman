@@ -7,39 +7,12 @@ from heman.auth import check_cups_allowed, check_contract_allowed
 from heman.config import peek
 
 
-CONTROL_MAP = {
-    'integer': 'input',
-    'selection': 'select'
-}
-
 TYPES_MAP = {
     'integer': 'integer',
     'char': 'string',
     'selection': 'string',
     'boolean': 'boolean'
 }
-
-
-def backform(definition):
-    res = []
-    for name, fdef in definition.items():
-        if fdef['type'] not in CONTROL_MAP:
-            continue
-        field = {
-            'name': name,
-            'label': fdef['string'],
-            'control': CONTROL_MAP[fdef['type']]
-        }
-        type_ = TYPES_MAP.get(fdef['type'])
-        if type_:
-            field['type'] = type_
-        selection = fdef.get('selection')
-        if selection:
-            field['options'] = [
-                dict(label=x[1], value=x[0]) for x in selection
-            ]
-        res.append(field)
-    return res
 
 
 def jsonform(definition):
@@ -128,7 +101,7 @@ class EmpoweringProfileDefForm(FormResource):
     def get(self):
         model = peek.model('empowering.modcontractual.profile')
         def_fields = model.fields_get()
-        res = backform(def_fields)
+        res = jsonform(def_fields)
         return Response(json.dumps(res), mimetype='application/json')
 
 
