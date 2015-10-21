@@ -118,7 +118,7 @@ class EmpoweringProfileForm(FormResource, AuthorizedByContractResource):
         return Response(json.dumps(res), mimetype='application/json')
 
     def post(self, contract):
-        model = peek.model('empowering.cups.building')
+        model = peek.model('empowering.modcontractual.profile')
         profile_ids = model.search([
             ('modcontractual_id.polissa_id.name', '=', contract)
         ])
@@ -134,7 +134,7 @@ class EmpoweringProfileForm(FormResource, AuthorizedByContractResource):
             profile_id = model.create(data)
         else:
             profile_id = profile_ids[0]
-            model.write([profile_ids], data)
+            model.write([profile_id], data)
         contract.write({'empowering_profile': profile_id})
         return {'status': 200, 'message': 'OK'}, 200
 
