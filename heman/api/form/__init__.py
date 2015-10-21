@@ -16,6 +16,17 @@ TYPES_MAP = {
 }
 
 
+def get_first_lang():
+    """Get the first lang of Accept-Language Header.
+    """
+    request_lang = request.headers.get('Accept-Language').split(',')
+    if request_lang:
+        lang = locale.normalize(request_lang[0]).split('.')[0]
+    else:
+        lang = False
+    return lang
+
+
 def jsonform(definition):
     res = {'schema': {}, 'form': []}
     schema = res['schema']
@@ -65,9 +76,7 @@ class FormResource(AuthorizedResource):
 
 class EmpoweringBuildingDefForm(FormResource):
     def get(self):
-        request_lang = request.headers.get('Accept-Language').split(',')
-        if request_lang:
-            lang = locale.normalize(request_lang[0]).split('.')[0]
+        lang = get_first_lang()
         model = peek.model('empowering.cups.building')
         def_fields = model.fields_get([], context={'lang': lang})
         res = jsonform(def_fields)
@@ -103,8 +112,9 @@ class EmpoweringBuildingForm(FormResource, AuthorizedByCupsResource):
 
 class EmpoweringProfileDefForm(FormResource):
     def get(self):
+        lang = get_first_lang()
         model = peek.model('empowering.modcontractual.profile')
-        def_fields = model.fields_get()
+        def_fields = model.fields_get([], context={'lang': lang})
         res = jsonform(def_fields)
         return Response(json.dumps(res), mimetype='application/json')
 
