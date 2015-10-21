@@ -126,7 +126,7 @@ class EmpoweringProfileForm(FormResource, AuthorizedByContractResource):
         contract_obj = peek.model('giscedata.polissa')
         con_id = contract_obj.search([('name', '=', contract)])
         if not con_id:
-            return {'status': 404, 'message': 'Not Found'}, 404
+            return jsonify({'status': 404, 'message': 'Not Found'}), 404
         contract = contract_obj.browse(con_id[0])
         if not profile_ids:
             mod = contract.modcontractual_activa.id
@@ -136,7 +136,7 @@ class EmpoweringProfileForm(FormResource, AuthorizedByContractResource):
             profile_id = profile_ids[0]
             model.write([profile_id], data)
         contract.write({'empowering_profile': profile_id})
-        return {'status': 200, 'message': 'OK'}, 200
+        return jsonify({'status': 200, 'message': 'OK'}), 200
 
 
 resources = [
