@@ -116,6 +116,8 @@ class EmpoweringProfileDefForm(FormResource):
         lang = get_first_lang()
         model = peek.model('empowering.modcontractual.profile')
         def_fields = model.fields_get([], context={'lang': lang})
+        def_fields.pop('femalePersonsNumber', None)
+        def_fields.pop('malePersonsNumber', None)
         res = jsonform(def_fields)
         return Response(json.dumps(res), mimetype='application/json')
 
