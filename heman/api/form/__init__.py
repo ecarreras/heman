@@ -156,9 +156,48 @@ class EmpoweringProfileForm(FormResource, AuthorizedByContractResource):
         return jsonify({'status': 200, 'message': 'OK'}), 200
 
 
+class EmpoweringSettingsDefForm(FormResource):
+    def get(self):
+        lang = get_first_lang()
+        model = peek.model('giscedata.cups.ps')
+        def_fields = model.fields_get(['empowering'], context={'lang': lang})
+        res = jsonform(def_fields)
+        return Response(json.dumps(res), mimetype='application/json')
+
+
+class EmpoweringSettingsForm(FormResource, AuthorizedByContractResource):
+    def get(self, contract):
+        contract_obj = peek.model('giscedata.polissa')
+        contract_ids = contract_obj.search([
+            ('name', '=', contract)
+        ])
+        if not contract_ids:
+            res = {}
+        else:
+            cups_id = contract_obj.read(contract_ids[0], ['cups'])['cups'][0]
+            cups_obj = peek.model('giscedata.cups.ps')
+            res = cups_obj.read(cups_id, ['empowering'])
+        return Response(json.dumps(res), mimetype='application/json')
+
+    def post(self, contract):
+        data = request.json
+        contract_obj = peek.model('giscedata.polissa')
+        con_id = contract_obj.search([('name', '=', contract)])
+        if not con_id:
+            return jsonify({'status': 404, 'message': 'Not Found'}), 404
+        cups_id = contract_obj.read(con_id, ['cups'])[0]['cups'][0]
+   
+        if 'empowering' not in data or not isinstance(data['empowering'], bool):  
+            return jsonify({'status': 404, 'message': 'Data missing'}), 404
+
+        cups_obj = peek.model('giscedata.cups.ps')
+        cups_obj.write([cups_id], {'empowering': data['empowering']})
+        return jsonify({'status': 200, 'message': 'OK'}), 200
 resources = [
     (EmpoweringBuildingDefForm, '/EmpoweringBuildingDefForm'),
     (EmpoweringBuildingForm, '/EmpoweringBuildingForm/<cups>'),
     (EmpoweringProfileDefForm, '/EmpoweringProfileDefForm'),
-    (EmpoweringProfileForm, '/EmpoweringProfileForm/<contract>')
+    (EmpoweringProfileForm, '/EmpoweringProfileForm/<contract>'),
+    (EmpoweringSettingsDefForm, '/EmpoweringSettingsDefForm'),
+    (EmpoweringSettingsForm, '/EmpoweringSettingsForm/<contract>')
 ]
