@@ -118,6 +118,10 @@ class EmpoweringProfileDefForm(FormResource):
         def_fields = model.fields_get([], context={'lang': lang})
         def_fields.pop('femalePersonsNumber', None)
         def_fields.pop('malePersonsNumber', None)
+        def_fields.pop('eduLevel_sec', None)
+        def_fields.pop('eduLevel_noStudies', None)
+        def_fields.pop('eduLevel_prim', None)
+        def_fields.pop('eduLevel_uni', None)
         res = jsonform(def_fields)
         return Response(json.dumps(res), mimetype='application/json')
 
