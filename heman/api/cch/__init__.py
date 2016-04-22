@@ -31,10 +31,14 @@ class CCHFact(CCHResource):
         start = end - relativedelta(months=interval)
         res = []
         current_app.logger.debug('CCH from {} to {}'.format(start, end))
-        cursor = mongo.db['tg_cchfact'].find({
+        search_query = {
             'name': cups,
-            'datetime': {'$gte': start, '$lt': end}
-        }, fields={'_id': False, 'datetime': True, 'ai': True}).sort(
+            'datetime': {'$gte': start, '$lt': end}}
+        if cups.endswith('0F'):
+            search_query.pop('name', None)
+            search_query['$or'] = [{'name': cups}, {'name': cups[:-2]}]
+        cursor = mongo.db['tg_cchfact'].find(search_query,
+            fields={'_id': False, 'datetime': True, 'ai': True}).sort(
             'datetime', ASCENDING
         )
         # Forcing local timezone
