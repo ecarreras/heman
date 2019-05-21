@@ -16,21 +16,23 @@ class PeriodRange(EmpoweringResource):
                     {"$match": {"contractId": contract}},
                     {"$group": {
                         "_id": "$item",
-                        "minPeriod": {"$min": "$month"},
-                        "maxPeriod": {"$max": "$month"}
+                        "minPeriod": {"$min": "$month"}
                     }}
                 ])
                 if cursor.get('result'):
-                    if result['max'] is None:
-                        result['max'] = cursor['result'][0]['maxPeriod']
-                    else:
-                        result['max'] = max(
-                            result['max'], cursor['result'][0]['maxPeriod']
-                        )
                     if result['min'] is None:
                         result['min'] = cursor['result'][0]['minPeriod']
                     else:
                         result['min'] = min(
                             result['min'], cursor['result'][0]['minPeriod']
+                        )
+                cursor = collection.find(
+                    {"contractId": contract}).sort("month", -1).limit(2).skip(1)
+                if cursor[0]:
+                    if result['max'] is None:
+                        result['max'] = cursor[0]['month']
+                    else:
+                        result['max'] = min(
+                            result['max'], cursor[0]['month']
                         )
         return jsonify(result)

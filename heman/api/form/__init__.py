@@ -4,7 +4,7 @@ import locale
 from flask import request, Response, jsonify
 
 from heman.api import AuthorizedResource
-from heman.auth import check_cups_allowed, check_contract_allowed
+from heman.auth import check_cups_allowed, check_contract_allowed, get_perm
 from heman.config import peek
 
 
@@ -181,6 +181,7 @@ class EmpoweringSettingsForm(FormResource, AuthorizedByContractResource):
             cups_id = contract_obj.read(contract_ids[0], ['cups'])['cups'][0]
             cups_obj = peek.model('giscedata.cups.ps')
             res = cups_obj.read(cups_id, ['empowering'])
+            res.update({'onlycch': get_perm(contract, 'onlycch')})
         return Response(json.dumps(res), mimetype='application/json')
 
     def post(self, contract):
