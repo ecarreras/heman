@@ -39,6 +39,10 @@ def check_cups_allowed(func):
     return decorator
 
 
+def get_perm(contract, perm):
+    return current_user.perm(contract, perm)
+
+
 class APIUser(login.UserMixin):
     """API User object
 
@@ -56,6 +60,13 @@ class APIUser(login.UserMixin):
 
     def allowed(self, value, key='name'):
         return value in [x[key] for x in self.allowed_contracts]
+
+    def perm(self, contract, key='onlycch'):
+        for x in self.allowed_contracts:
+            if x['name'] == contract:
+                return x.get(key, False)
+
+        return False
 
 
 @login_manager.header_loader

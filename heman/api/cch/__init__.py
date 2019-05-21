@@ -32,12 +32,11 @@ class CCHFact(CCHResource):
         res = []
         current_app.logger.debug('CCH from {} to {}'.format(start, end))
         search_query = {
-            'name': cups,
-            'datetime': {'$gte': start, '$lt': end}}
-        if cups.endswith('0F'):
-            search_query.pop('name', None)
-            search_query['$or'] = [{'name': cups}, {'name': cups[:-2]}]
-        cursor = mongo.db['tg_cchfact'].find(search_query,
+            'name': {'$regex': '^{}'.format(cups[:20])},
+            'datetime': {'$gte': start, '$lt': end}
+        }
+        cursor = mongo.db['tg_cchfact'].find(
+            search_query,
             fields={'_id': False, 'datetime': True, 'ai': True}).sort(
             'datetime', ASCENDING
         )
@@ -52,6 +51,7 @@ class CCHFact(CCHResource):
                 'value': item['ai']
             })
         return Response(json.dumps(res), mimetype='application/json')
+
 
 resources = [
     (CCHFact, '/CCHFact/<cups>/<period>')
