@@ -21,6 +21,40 @@ class CCHResource(AuthorizedResource):
 
 
 class CCHFact(CCHResource):
+
+    def dict_to_array_curves(curves_dict):
+        curves = []
+        for _datetime, consumption in curves_dict.items():
+            dt = _datetime
+            dt_tuple = datetime(dt.year, dt.month, dt.day, dt.hour).timetuple()
+            curves.append({
+                'date': time.mktime(dt_tuple) * 1000, # ?? *1000 ?
+                'value': consumption
+            })
+        return curves
+
+    def merge_curves(_datetimes, f1_curves, p1_curves):
+        curves = []
+        for _datetime in _datetimes:
+            dt = curve['datetime']
+            dt_tuple = datetime(dt.year, dt.month, dt.day, dt.hour).timetuple()
+            if f1_curves.get(_datetime, False):
+                value = f1_curves.get(_datetime)
+            else:
+                value = p1_curves.get(_datetime)
+            curves.append({
+                'date': time.mktime(dt_tuple) * 1000, # ?? *1000 ?
+                'value': value
+            })
+        return curves
+
+    def get_cursor_db(self, collection, query):
+        return mongo.db[collection].find(
+            query,
+            fields={'_id': False, 'datetime': True, 'ai': True}).sort(
+            'datetime', ASCENDING
+        )
+
     def get(self, cups, period):
         interval = request.args.get('interval')
         try:
@@ -35,21 +69,42 @@ class CCHFact(CCHResource):
             'name': {'$regex': '^{}'.format(cups[:20])},
             'datetime': {'$gte': start, '$lt': end}
         }
-        cursor = mongo.db['tg_cchfact'].find(
-            search_query,
-            fields={'_id': False, 'datetime': True, 'ai': True}).sort(
-            'datetime', ASCENDING
-        )
-        # Forcing local timezone
+        p1_search_query = {
+            'name': {'$regex': '^{}'.format(cups[:20])},
+            'datetime': {'$gte': start, '$lt': end},
+            'type': 'p'
+        }
+        cursor_f5d = self.get_cursor_db(collection='tg_cchfact', query=search_query)
+        cursor_f1 = self.get_cursor_db(collection='tg_f1', query=search_query)
+        cursor_p1 = self.get_cursor_db(collection='tg_p1', query=p1_search_query)
 
-        for item in cursor:
-            dt = item['datetime']
-            dt_tuple = datetime(dt.year, dt.month, dt.day, dt.hour).timetuple()
-            res.append({
-                # Unix timestamp in Javascript is python * 1000
-                'date': time.mktime(dt_tuple) * 1000,
-                'value': item['ai']
-            })
+        # Forcing local timezone
+        if cursor_f5d.count() > 0:
+            for item in cursor_f5d:
+                dt = item['datetime']
+                dt_tuple = datetime(dt.year, dt.month, dt.day, dt.hour).timetuple()
+                res.append({
+                    # Unix timestamp in Javascript is python * 1000
+                    'date': time.mktime(dt_tuple) * 1000,
+                    'value': item['ai']
+                })
+        elif cursor_f1.count() > 0 or cursor_p1.count() > 0:
+            f1_curves = {}
+            p1_curves = {}
+            _datetimes = set()
+            contador = 0
+            for curve in cursor_f1:
+                f1_curves[curve['datetime']] = curve['ai']
+                _datetimes.add(curve['datetime'])
+            for curve in cursor_p1:
+                p1_curves[curve['datetime']] = curve['ai']
+                _datetimes.add(curve['datetime'])
+
+            if len(_datetimes) == len(f1_curves):
+                res = self.dict_to_array_curves(f1_curves)
+            else:
+                res = self.merge_curves(_datetimes, f1_curves, p1_curves)
+
         return Response(json.dumps(res), mimetype='application/json')
 
 
