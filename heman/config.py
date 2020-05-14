@@ -3,11 +3,10 @@ import logging
 import os
 
 from flask import Flask
-from flask.ext.pymongo import PyMongo
+from flask_pymongo import PyMongo
 from raven.contrib.flask import Sentry
 
 from heman.api import HemanAPI
-from amoniak.utils import setup_peek
 
 
 api = HemanAPI(prefix='/api')
@@ -25,11 +24,6 @@ In other parts of the application you can do::
 
     mongo.db.collection.find({"foo": "bar"})
 """
-
-peek = setup_peek()
-"""ERP Backend configuration
-"""
-
 
 def create_app(**config):
     """Application Factory
@@ -63,21 +57,11 @@ def create_app(**config):
 def configure_api(app):
     """Configure API Endpoints.
     """
-    from heman.api.empowering import resources as empowering_resources
     from heman.api.cch import resources as cch_resources
-    from heman.api.form import resources as form_resources
     from heman.api import ApiCatchall
-
-    # Add Empowering resources
-    for resource in empowering_resources:
-        api.add_resource(*resource)
 
     # Add CCHFact resources
     for resource in cch_resources:
-        api.add_resource(*resource)
-
-    # Add Form resources
-    for resource in form_resources:
         api.add_resource(*resource)
 
     api.add_resource(ApiCatchall, '/<path:path>')
@@ -114,9 +98,10 @@ def configure_login(app):
 
     Uses `Flask-Login <https://flask-login.readthedocs.org>`_
     """
-    from heman.auth import login_manager, login
+    from heman.auth import login_manager
+    from flask_login import logout_user
     login_manager.init_app(app)
 
     @app.teardown_request
     def force_logout(*args, **kwargs):
-        login.logout_user()
+        logout_user()
