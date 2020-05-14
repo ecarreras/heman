@@ -4,7 +4,7 @@ import json
 import time
 
 from flask import current_app, jsonify, request, Response
-from flask.ext.pymongo import ASCENDING
+from pymongo import ASCENDING
 
 from heman.api import AuthorizedResource
 from heman.auth import check_cups_allowed
@@ -22,38 +22,51 @@ class CCHResource(AuthorizedResource):
 
 class CCHFact(CCHResource):
 
-    def dict_to_array_curves(curves_dict):
-        curves = []
-        for _datetime, consumption in curves_dict.items():
-            dt = _datetime
-            dt_tuple = datetime(dt.year, dt.month, dt.day, dt.hour).timetuple()
-            curves.append({
-                'date': time.mktime(dt_tuple) * 1000, # ?? *1000 ?
-                'value': consumption
-            })
-        return curves
-
-    def merge_curves(_datetimes, f1_curves, p1_curves):
-        curves = []
-        for _datetime in _datetimes:
-            dt = curve['datetime']
-            dt_tuple = datetime(dt.year, dt.month, dt.day, dt.hour).timetuple()
-            if f1_curves.get(_datetime, False):
-                value = f1_curves.get(_datetime)
-            else:
-                value = p1_curves.get(_datetime)
-            curves.append({
-                'date': time.mktime(dt_tuple) * 1000, # ?? *1000 ?
-                'value': value
-            })
-        return curves
-
     def get_cursor_db(self, collection, query):
         return mongo.db[collection].find(
             query,
             fields={'_id': False, 'datetime': True, 'ai': True}).sort(
             'datetime', ASCENDING
         )
+
+    def ordered_merge(self, cursor_f1, cursor_p1):
+        res = []
+        item_f1 = next(cursor_f1, False)
+        item_p1 = next(cursor_p1, False)
+        while item_f1 and item_p1:
+            if item_f1['datetime'] == item_p1['datetime']:
+                res.append({
+                    'date': time.mktime((item_f1['datetime']).timetuple()) * 1000,
+                    'value': (item_f1['ai'])
+                })
+                item_f1 = next(cursor_f1, False)
+                item_p1 = next(cursor_p1, False)
+            elif item_f1['datetime'] < item_p1['datetime']:
+                res.append({
+                    'date': time.mktime((item_f1['datetime']).timetuple()) * 1000,
+                    'value': item_f1['ai']
+                })
+                item_f1 = next(cursor_f1, False)
+            else:
+                res.append({
+                    'date': time.mktime((item_p1['datetime']).timetuple()) * 1000,
+                    'value': item_p1['ai']
+                })
+                item_p1 = next(cursor_p1, False)
+
+        while item_f1:
+            res.append({
+                'date': time.mktime((item_f1['datetime']).timetuple()) * 1000,
+                'value': item_f1['ai']
+            })
+            item_f1 = next(cursor_f1, False)
+        while item_p1:
+            res.append({
+                'date': time.mktime((item_p1['datetime']).timetuple()) * 1000,
+                'value': item_p1['ai']
+            })
+            item_p1 = next(cursor_p1, False)
+        return res
 
     def get(self, cups, period):
         interval = request.args.get('interval')
@@ -89,21 +102,7 @@ class CCHFact(CCHResource):
                     'value': item['ai']
                 })
         elif cursor_f1.count() > 0 or cursor_p1.count() > 0:
-            f1_curves = {}
-            p1_curves = {}
-            _datetimes = set()
-            contador = 0
-            for curve in cursor_f1:
-                f1_curves[curve['datetime']] = curve['ai']
-                _datetimes.add(curve['datetime'])
-            for curve in cursor_p1:
-                p1_curves[curve['datetime']] = curve['ai']
-                _datetimes.add(curve['datetime'])
-
-            if len(_datetimes) == len(f1_curves):
-                res = self.dict_to_array_curves(f1_curves)
-            else:
-                res = self.merge_curves(_datetimes, f1_curves, p1_curves)
+            res = self.ordered_merge(cursor_f1, cursor_p1)
 
         return Response(json.dumps(res), mimetype='application/json')
 
