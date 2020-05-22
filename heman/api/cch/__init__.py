@@ -29,44 +29,36 @@ class CCHFact(CCHResource):
             'datetime', ASCENDING
         )
 
-    def ordered_merge(self, cursor_f1, cursor_p1):
-        res = []
-        item_f1 = next(cursor_f1, False)
-        item_p1 = next(cursor_p1, False)
-        while item_f1 and item_p1:
-            if item_f1['datetime'] == item_p1['datetime']:
-                res.append({
-                    'date': time.mktime((item_f1['datetime']).timetuple()) * 1000,
-                    'value': (item_f1['ai'])
-                })
-                item_f1 = next(cursor_f1, False)
-                item_p1 = next(cursor_p1, False)
-            elif item_f1['datetime'] < item_p1['datetime']:
-                res.append({
-                    'date': time.mktime((item_f1['datetime']).timetuple()) * 1000,
-                    'value': item_f1['ai']
-                })
-                item_f1 = next(cursor_f1, False)
-            else:
-                res.append({
-                    'date': time.mktime((item_p1['datetime']).timetuple()) * 1000,
-                    'value': item_p1['ai']
-                })
-                item_p1 = next(cursor_p1, False)
+    def _curve_value(self, curve):
+        return {
+            'date': time.mktime((curve['datetime']).timetuple()) * 1000,
+            'value': curve['ai']
+        }
 
-        while item_f1:
-            res.append({
-                'date': time.mktime((item_f1['datetime']).timetuple()) * 1000,
-                'value': item_f1['ai']
-            })
-            item_f1 = next(cursor_f1, False)
-        while item_p1:
-            res.append({
-                'date': time.mktime((item_p1['datetime']).timetuple()) * 1000,
-                'value': item_p1['ai']
-            })
-            item_p1 = next(cursor_p1, False)
-        return res
+    def ordered_merge(self, cursor_f1, cursor_p1):
+        curves = []
+        f1_curve = next(cursor_f1, False)
+        p1_curve = next(cursor_p1, False)
+        while f1_curve and p1_curve:
+            if f1_curve['datetime'] == p1_curve['datetime']:
+                curves.append(self._curve_value(f1_curve))
+                f1_curve = next(cursor_f1, False)
+                p1_curve = next(cursor_p1, False)
+            elif f1_curve['datetime'] < p1_curve['datetime']:
+                curves.append(self._curve_value(f1_curve))
+                f1_curve = next(cursor_f1, False)
+            else:
+                curves.append(self._curve_value(p1_curve))
+                p1_curve = next(cursor_p1, False)
+
+        while f1_curve:
+            curves.append(self._curve_value(f1_curve))
+            f1_curve = next(cursor_f1, False)
+        while p1_curve:
+            curves.append(self._curve_value(p1_curve))
+            p1_curve = next(cursor_p1, False)
+
+        return curves
 
     def get(self, cups, period):
         interval = request.args.get('interval')
@@ -93,14 +85,8 @@ class CCHFact(CCHResource):
 
         # Forcing local timezone
         if cursor_f5d.count() > 0:
-            for item in cursor_f5d:
-                dt = item['datetime']
-                dt_tuple = datetime(dt.year, dt.month, dt.day, dt.hour).timetuple()
-                res.append({
-                    # Unix timestamp in Javascript is python * 1000
-                    'date': time.mktime(dt_tuple) * 1000,
-                    'value': item['ai']
-                })
+            for curve in cursor_f5d:
+                res.append(self._curve_value(curve))
         elif cursor_f1.count() > 0 or cursor_p1.count() > 0:
             res = self.ordered_merge(cursor_f1, cursor_p1)
 
