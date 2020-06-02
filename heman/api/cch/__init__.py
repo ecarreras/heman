@@ -29,10 +29,10 @@ class CCHFact(CCHResource):
             'datetime', ASCENDING
         )
 
-    def _curve_value(self, curve):
+    def _curve_value(self, curve, unit):
         return {
             'date': time.mktime((curve['datetime']).timetuple()) * 1000,
-            'value': curve['ai']
+            'value': curve['ai'] * 1000 if unit == 'kW' else curve['ai']
         }
 
     def ordered_merge(self, cursor_f1, cursor_p1):
@@ -41,21 +41,21 @@ class CCHFact(CCHResource):
         p1_curve = next(cursor_p1, False)
         while f1_curve and p1_curve:
             if f1_curve['datetime'] == p1_curve['datetime']:
-                curves.append(self._curve_value(f1_curve))
+                curves.append(self._curve_value(f1_curve, 'kW'))
                 f1_curve = next(cursor_f1, False)
                 p1_curve = next(cursor_p1, False)
             elif f1_curve['datetime'] < p1_curve['datetime']:
-                curves.append(self._curve_value(f1_curve))
+                curves.append(self._curve_value(f1_curve, 'kW'))
                 f1_curve = next(cursor_f1, False)
             else:
-                curves.append(self._curve_value(p1_curve))
+                curves.append(self._curve_value(p1_curve, 'kW'))
                 p1_curve = next(cursor_p1, False)
 
         while f1_curve:
-            curves.append(self._curve_value(f1_curve))
+            curves.append(self._curve_value(f1_curve, 'kW'))
             f1_curve = next(cursor_f1, False)
         while p1_curve:
-            curves.append(self._curve_value(p1_curve))
+            curves.append(self._curve_value(p1_curve, 'kW'))
             p1_curve = next(cursor_p1, False)
 
         return curves
@@ -86,7 +86,7 @@ class CCHFact(CCHResource):
         # Forcing local timezone
         if cursor_f5d.count() > 0:
             for curve in cursor_f5d:
-                res.append(self._curve_value(curve))
+                res.append(self._curve_value(curve, 'W'))
         elif cursor_f1.count() > 0 or cursor_p1.count() > 0:
             res = self.ordered_merge(cursor_f1, cursor_p1)
 
