@@ -27,7 +27,7 @@ class InfoenergiaReport(InfoenergiaResource):
 
         return mongo.db[collection].find(
             query,
-            {'_items': True}
+            {'_items': 1}
         ).limit(limit)
 
     def get(self, contract):
@@ -39,12 +39,12 @@ class InfoenergiaReport(InfoenergiaResource):
 
         cursor_infoenergia = self.get_cursor_db(collection='infoenergia_reports', query=search_query, limit=1)
 
-        # Forcing local timezone
+        res = []
         if cursor_infoenergia.count() > 0:
-            for item in cursor_infoenergia:
-                res.append(item)
+            for report in cursor_infoenergia:
+                res.append(report['_items'])
 
-        return Response(res, mimetype='application/json')
+        return Response(json.dumps(res), mimetype='application/json')
 
 
 resources = [
