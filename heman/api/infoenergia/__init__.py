@@ -38,7 +38,6 @@ class InfoenergiaReport(InfoenergiaResource):
         }
 
         cursor_infoenergia = self.get_cursor_db(collection='infoenergia_reports', query=search_query, limit=1)
-        import pdb; pdb.set_trace()
 
         # Forcing local timezone
         if cursor_infoenergia.count() > 0:
