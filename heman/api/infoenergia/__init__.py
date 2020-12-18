@@ -10,7 +10,6 @@ from heman.api import AuthorizedResource
 from heman.auth import check_contract_allowed
 from heman.config import mongo
 
-# https://infoenergia-api.somenergia.coop/api/InfoenergiaReport/ES0031406238503003AP0F
 
 class InfoenergiaResource(AuthorizedResource):
     method_decorators = (
