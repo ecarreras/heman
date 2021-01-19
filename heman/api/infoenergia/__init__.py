@@ -1,4 +1,5 @@
 import json
+import pymongo
 
 from flask import current_app, jsonify, Response
 
@@ -18,28 +19,27 @@ class InfoenergiaResource(AuthorizedResource):
 
 class InfoenergiaReport(InfoenergiaResource):
 
-    def get_cursor_db(self, collection, query, limit):
+    def get_cursor_db(self, collection, query):
 
-        return mongo.db[collection].find(
+        return mongo.db[collection].find_one(
             query,
-            {'_items': 1}
-        ).limit(limit)
+            sort=[('months', pymongo.ASCENDING)]
+        )
 
     def get(self, contract):
         current_app.logger.debug('Infoenergia Report, contract {}'.format(contract))
 
         search_query = {
-            '_items.0.contractId': contract
+            'contractId': contract
         }
+        infoenergia_report = self.get_last_report(collection='infoenergia_reports', query=search_query)
 
-        cursor_infoenergia = self.get_cursor_db(collection='infoenergia_reports', query=search_query, limit=1)
+        if cursor_infoenergia:
+            return Response(json.dumps(cursor_infoenergia), mimetype='application/json')
 
-        res = []
-        if cursor_infoenergia.count() > 0:
-            for report in cursor_infoenergia:
-                res.append(report['_items'])
+        return Response({}, mimetype='application/json')
 
-        return Response(json.dumps(res), mimetype='application/json')
+
 
 
 resources = [
