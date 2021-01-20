@@ -36,8 +36,47 @@ class InfoenergiaReport(InfoenergiaResource):
         return Response({}, mimetype='application/json')
 
 
+class SeasonalProfile(InfoenergiaResource):
 
+    def get(self, contract):
+        current_app.logger.debug(
+            'SeasonalProfile from Infoenergia Report, contract {}'.format(contract)
+        )
+
+        infoenergia_report = self.get_last_infoenergia_report(contract_name=contract)
+
+        have_results = infoenergia_report and \
+            infoenergia_report.get('results', {}).get('seasonalProfile')
+        if have_results:
+            return Response(
+                json.dumps(infoenergia_report['results']['seasonalProfile']),
+                mimetype='application/json'
+            )
+
+        return Response({}, mimetype='application/json')
+
+
+class DistributionByPeriod(InfoenergiaResource):
+
+    def get(self, contract):
+        current_app.logger.debug(
+            'DistributionByPeriod from Infoenergia Report, contract {}'.format(contract)
+        )
+
+        infoenergia_report = self.get_last_infoenergia_report(contract_name=contract)
+
+        have_results = infoenergia_report and \
+            infoenergia_report.get('results', {}).get('distributionByPeriods')
+        if have_results:
+            return Response(
+                json.dumps(infoenergia_report['results']['distributionByPeriods']),
+                mimetype='application/json'
+            )
+
+        return Response({}, mimetype='application/json')
 
 resources = [
-    (InfoenergiaReport, '/InfoenergiaReport/<contract>')
+    (InfoenergiaReport, '/InfoenergiaReport/<contract>'),
+    (SeasonalProfile, '/InfoenergiaReport/data/seasonalprofile/<contract>'),
+    (DistributionByPeriod, '/InfoenergiaReport/data/distributionbyperiod/<contract>'),
 ]
