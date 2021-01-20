@@ -16,26 +16,22 @@ class InfoenergiaResource(AuthorizedResource):
     def options(self, *args, **kwargs):
         return jsonify({})
 
-
-class InfoenergiaReport(InfoenergiaResource):
-
-    def get_cursor_db(self, collection, query):
-
-        return mongo.db[collection].find_one(
-            query,
+    def get_last_infoenergia_report(self, contract_name):
+        return mongo.db['infoenergia_reports'].find_one(
+            {'contractId': contract_name},
             sort=[('months', pymongo.ASCENDING)]
         )
+
+
+class InfoenergiaReport(InfoenergiaResource):
 
     def get(self, contract):
         current_app.logger.debug('Infoenergia Report, contract {}'.format(contract))
 
-        search_query = {
-            'contractId': contract
-        }
-        infoenergia_report = self.get_last_report(collection='infoenergia_reports', query=search_query)
+        infoenergia_report = self.get_last_infoenergia_report(contract_name=contract)
 
-        if cursor_infoenergia:
-            return Response(json.dumps(cursor_infoenergia), mimetype='application/json')
+        if infoenergia_report:
+            return Response(json.dumps(infoenergia_report), mimetype='application/json')
 
         return Response({}, mimetype='application/json')
 
