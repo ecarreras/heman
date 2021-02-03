@@ -58,10 +58,15 @@ def configure_api(app):
     """Configure API Endpoints.
     """
     from heman.api.cch import resources as cch_resources
+    from heman.api.infoenergia import resources as infoenergia_resources
     from heman.api import ApiCatchall
 
     # Add CCHFact resources
     for resource in cch_resources:
+        api.add_resource(*resource)
+
+    # Add InfoEnergia resources
+    for resource in infoenergia_resources:
         api.add_resource(*resource)
 
     api.add_resource(ApiCatchall, '/<path:path>')
