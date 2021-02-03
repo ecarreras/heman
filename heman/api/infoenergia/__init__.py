@@ -19,7 +19,7 @@ class InfoenergiaResource(AuthorizedResource):
     def get_last_infoenergia_report(self, contract_name):
         return mongo.db['infoenergia_reports'].find_one(
             {'contractName': contract_name},
-            sort=[('months', pymongo.ASCENDING)]
+            sort=[('months', pymongo.DESCENDING)]
         )
 
 
