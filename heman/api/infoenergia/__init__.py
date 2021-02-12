@@ -44,9 +44,9 @@ class SeasonalProfile(InfoenergiaResource):
         )
         infoenergia_report = self.get_last_infoenergia_report(contract_name=contract)
         have_results = infoenergia_report and \
-            infoenergia_report.get('results', {}).get('seasonalProfile')
+            infoenergia_report.get('results', {}).get('fourSeasonsConsumptionEvolution')
         if have_results:
-            result = infoenergia_report['results']['seasonalProfile']
+            result = infoenergia_report['results']['fourSeasonsConsumptionEvolution']
             result.update({'updated': infoenergia_report.get('beedataUpdateDate')})
             return Response(
                 json.dumps(result),
