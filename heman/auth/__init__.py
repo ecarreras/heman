@@ -2,13 +2,13 @@ from __future__ import absolute_import
 from functools import wraps
 
 from flask import current_app
-from flask.ext import login
-from flask.ext.login import current_user
+from flask_login import LoginManager, UserMixin
+from flask_login import current_user
 
 from heman.config import mongo
 
 
-login_manager = login.LoginManager()
+login_manager = LoginManager()
 """Login manager object
 """
 
@@ -43,7 +43,7 @@ def get_perm(contract, perm):
     return current_user.perm(contract, perm)
 
 
-class APIUser(login.UserMixin):
+class APIUser(UserMixin):
     """API User object
 
     :param token: token for this user

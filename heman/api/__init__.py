@@ -1,14 +1,15 @@
 from __future__ import absolute_import
 
 from flask import jsonify
-from flask.ext import restful, login, cors
+from flask_restful import Api, Resource
+from flask_cors import cross_origin
+from flask_login import login_required
 
-
-class HemanAPI(restful.Api):
+class HemanAPI(Api):
     pass
 
 
-class BaseResource(restful.Resource):
+class BaseResource(Resource):
     """Base resource
     """
     def options(self, *args, **kwargs):
@@ -20,7 +21,7 @@ class AuthorizedResource(BaseResource):
 
     Base resource to inherit if the resource must be protected with auth
     """
-    method_decorators = [login.login_required, cors.cross_origin()]
+    method_decorators = [login_required, cross_origin()]
 
 
 class ApiCatchall(BaseResource):
