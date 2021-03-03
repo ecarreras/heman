@@ -44,9 +44,9 @@ class SeasonalProfile(InfoenergiaResource):
         )
         infoenergia_report = self.get_last_infoenergia_report(contract_name=contract)
         have_results = infoenergia_report and \
-            infoenergia_report.get('results', {}).get('fourSeasonsConsumptionEvolution')
+            infoenergia_report.get('results', {}).get('seasonalProfile')
         if have_results:
-            result = infoenergia_report['results']['fourSeasonsConsumptionEvolution']
+            result = infoenergia_report['results']['seasonalProfile']
             result.update({'updated': infoenergia_report.get('beedataUpdateDate')})
             return Response(
                 json.dumps(result),
@@ -66,9 +66,9 @@ class DistributionByPeriod(InfoenergiaResource):
         infoenergia_report = self.get_last_infoenergia_report(contract_name=contract)
 
         have_results = infoenergia_report and \
-            infoenergia_report.get('results', {}).get('donutDistributionByPeriod')
+            infoenergia_report.get('results', {}).get('distributionByPeriods')
         if have_results:
-            result = infoenergia_report['results']['donutDistributionByPeriod']
+            result = infoenergia_report['results']['distributionByPeriods']
             result.update({'updated': infoenergia_report.get('beedataUpdateDate')})
             return Response(
                 json.dumps(result),
@@ -88,9 +88,9 @@ class DistributionByTypeOfUse(InfoenergiaResource):
         infoenergia_report = self.get_last_infoenergia_report(contract_name=contract)
 
         have_results = infoenergia_report and \
-            infoenergia_report.get('results', {}).get('donutDistributionByType')
+            infoenergia_report.get('results', {}).get('distributionByTypeOfUse')
         if have_results:
-            result = infoenergia_report['results']['donutDistributionByType']
+            result = infoenergia_report['results']['distributionByTypeOfUse']
             result.update({'updated': infoenergia_report.get('beedataUpdateDate')})
             return Response(
                 json.dumps(result),
@@ -110,9 +110,9 @@ class DailyProfile(InfoenergiaResource):
         infoenergia_report = self.get_last_infoenergia_report(contract_name=contract)
 
         have_results = infoenergia_report and \
-            infoenergia_report.get('results', {}).get('barDailyTypicalProfile')
+            infoenergia_report.get('results', {}).get('dailyTypicalProfileLast12Months')
         if have_results:
-            result = infoenergia_report['results']['barDailyTypicalProfile'].get('last12Months', {})
+            result = infoenergia_report['results']['dailyTypicalProfileLast12Months']
             result.update({'updated': infoenergia_report.get('beedataUpdateDate')})
             return Response(
                 json.dumps(result),
@@ -132,9 +132,9 @@ class WeeklyProfile(InfoenergiaResource):
         infoenergia_report = self.get_last_infoenergia_report(contract_name=contract)
 
         have_results = infoenergia_report and \
-            infoenergia_report.get('results', {}).get('areaWeeklyAvgConsumption')
+            infoenergia_report.get('results', {}).get('weeklyAvgConsumeLast12Months')
         if have_results:
-            result = infoenergia_report['results']['areaWeeklyAvgConsumption'].get('last12Months', {})
+            result = infoenergia_report['results']['weeklyAvgConsumeLast12Months']
             result.update({'updated': infoenergia_report.get('beedataUpdateDate')})
             return Response(
                 json.dumps(result),
@@ -154,9 +154,9 @@ class MonthsProfile(InfoenergiaResource):
         infoenergia_report = self.get_last_infoenergia_report(contract_name=contract)
 
         have_results = infoenergia_report and \
-            infoenergia_report.get('results', {}).get('calendarConsumption3Months')
+            infoenergia_report.get('results', {}).get('last3MonthsProfile')
         if have_results:
-            result = infoenergia_report['results']['calendarConsumption3Months'].get('calendar', {})
+            result = infoenergia_report['results']['last3MonthsProfile']
             result.update({'updated': infoenergia_report.get('beedataUpdateDate')})
             return Response(
                 json.dumps(result),
