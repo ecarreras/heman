@@ -1,3 +1,4 @@
+from builtins import next
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import json
