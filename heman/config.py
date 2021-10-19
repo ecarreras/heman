@@ -50,6 +50,9 @@ def create_app(**config):
     configure_api(app)
     configure_mongodb(app)
     configure_login(app)
+    
+    for route in app.url_map.iter_rules():
+        print(route)
 
     return app
 
