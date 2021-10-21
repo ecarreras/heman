@@ -31,33 +31,35 @@ def mongodb():
 
 @pytest.fixture
 def scenario_data(mongodb):
-    with open('testdata/pvautosize_example.json') as json_file:
-        data = json.load(json_file)
-
+    contract = '666666'
+    token = 'mytoken'
+    user = APIUser(
+        token,
+        [contract]
+    )
     mongodb.tokens.insert_one({
         'allowed_contracts': [
             {'cups': 'ES1111111111111111VL0F', 'name': '666666'}
         ],
-        'token': 'mytoken'
+        'token': token,
     })
 
+    with open('testdata/pvautosize_example.json') as json_file:
+        data = json.load(json_file)
     mongodb.photovoltaic_reports.insert_one({
         'contractName':data['_items'][0]['contractId'],
         'beedataUpdateDate':data['_items'][0]['_created'],
         'beedataCreateDate':data['_items'][0]['_created'],
         'results': data['_items'][0]['results'],
     })
+    yield contract, token
 
 def test_scenario_report(api, scenario_data):
-    contract='666666'
-    user = APIUser(
-        'mytoken',
-        ['666666']
-    )
+    contract, token = scenario_data
     r = api.get('/api/ScenarioReport/{}'.format(contract),
         json={},
         headers=dict(
-            Authorization = 'token mytoken'
+            Authorization = 'token {}'.format(token)
         ),
     )
 
