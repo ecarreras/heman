@@ -53,7 +53,7 @@ class ScenarioReport(PVCalculatorResource):
             for i,scenario in enumerate(scenarios)
             if scenario['settings']['tilt'] == tiltDegrees
             and scenario['settings']['azimuth'] == azimuthDegrees
-            and scenario['settings']['power'] == powerKwh
+            and (scenario['settings']['power'] == powerKwh or not powerKwh)
         ][-1]
 
         result = dict(
