@@ -48,13 +48,15 @@ class ScenarioReport(PVCalculatorResource):
             print("Error {}", e)
             return Response({}, mimetype='application/json')
 
-        scenario = [
+        scenario = min((
             scenario
             for i,scenario in enumerate(scenarios)
             if scenario['settings']['tilt'] == tiltDegrees
             and scenario['settings']['azimuth'] == azimuthDegrees
             and (scenario['settings']['power'] == powerKwh or not powerKwh)
-        ][-1]
+            ),
+            key=lambda s: s['economics']['payback'],
+        )
 
         result = dict(
             loadKwhYear = totalLoad,

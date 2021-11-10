@@ -78,7 +78,7 @@ def test__scenario_report__with_power(api, scenario_data):
         "installationCostEuro": 14805.56000075138,
         "savingsEuroYear": 505.2692606181667,
         "paybackYears": 20.54521623587875,
-        "productionToLoadKwhYear": 1015.1856466597212
+        "productionToLoadKwhYear": 1015.1856466597212,
     }
 
 
@@ -95,12 +95,12 @@ def test__scenario_report__optimal_payback(api, scenario_data):
     )
 
     assert r.get_json() == {
-        "productionToGridKwhYear": 11853.280996988628,
-        "loadKwhYear": 2777.4230000000002,
-        "productionKwhYear": 12863.530773648346,
-        "installationCostEuro": 14805.56000075138,
-        "savingsEuroYear": 505.2692606181667,
-        "paybackYears": 20.54521623587875,
-        "productionToLoadKwhYear": 1015.1856466597212
+        'productionToGridKwhYear': 1938.3961489902156,
+        'loadKwhYear': 2777.4230000000002,
+        'productionKwhYear': 2713.065471190853,
+        'installationCostEuro': 4689.960000238015,
+        'savingsEuroYear': 307.05135592354816,
+        'paybackYears': 12.4569525340302,
+        'productionToLoadKwhYear': 779.605192200637,
     }
 
