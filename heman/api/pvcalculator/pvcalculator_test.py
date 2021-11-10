@@ -54,10 +54,14 @@ def scenario_data(mongodb):
     })
     yield contract, token
 
-def test_scenario_report(api, scenario_data):
+def test__scenario_report__with_power(api, scenario_data):
     contract, token = scenario_data
     r = api.get('/api/ScenarioReport/{}'.format(contract),
-        json={},
+        query_string=dict(
+            tilt=30.0,
+            azimuth='180#0',
+            power='10.640 kWp',
+        ),
         headers=dict(
             Authorization = 'token {}'.format(token)
         ),

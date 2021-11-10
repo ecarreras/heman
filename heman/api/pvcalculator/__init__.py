@@ -2,6 +2,7 @@ import json
 import pymongo
 
 from flask import current_app, jsonify, Response
+from flask_restful import request
 
 from heman.api import AuthorizedResource
 from heman.auth import check_contract_allowed
@@ -28,13 +29,17 @@ class ScenarioReport(PVCalculatorResource):
     def get(self, contract):
         current_app.logger.debug('PVCalculator Report, contract {}'.format(contract))
 
+        tiltDegrees = float(request.args.get('tilt'))
+        azimuthDegrees = request.args.get('azimuth')
+        powerKwh = request.args.get('power')
+
         scenario_report = self.get_last_scenario(contract_name=contract)
 
         if not scenario_report:
             return Response({}, mimetype='application/json')
 
         try:
-            scenario = scenario_report['results']['pvAutoSize']['scenarios'][-1]
+            scenarios = scenario_report['results']['pvAutoSize']['scenarios']
             totalLoad = scenario_report['results']['pvAutoSize']['load']['total']
         except KeyError as e:
             print("Error {}", e)
@@ -43,15 +48,14 @@ class ScenarioReport(PVCalculatorResource):
             print("Error {}", e)
             return Response({}, mimetype='application/json')
 
-        """
-        [
-            (
-                abs(power - scenario['settings']['power']),
-                abs()
+        scenario = [
+            scenario
+            for i,scenario in enumerate(scenarios)
+            if scenario['settings']['tilt'] == tiltDegrees
+            and scenario['settings']['azimuth'] == azimuthDegrees
+            and scenario['settings']['power'] == powerKwh
+        ][-1]
 
-            for i,scenario in itemize(scenario_report['results']['pvAutoSize']['scenarios'])
-        ]
-        """
         result = dict(
             loadKwhYear = totalLoad,
             productionKwhYear = scenario['generation']['total'],
