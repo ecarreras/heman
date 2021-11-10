@@ -104,3 +104,21 @@ def test__scenario_report__optimal_payback(api, scenario_data):
         'productionToLoadKwhYear': 779.605192200637,
     }
 
+
+def test__scenario_report__parameter_value_not_found(api, scenario_data):
+    contract, token = scenario_data
+    r = api.get('/api/ScenarioReport/{}'.format(contract),
+        query_string=dict(
+            tilt=31.0, # Value for tilt not found
+            azimuth='180#0',
+        ),
+        headers=dict(
+            Authorization = 'token {}'.format(token)
+        ),
+    )
+
+    assert r.get_json() == {
+        'error': 'NOT_FOUND',
+        'message': "Scenario not found",
+    }
+

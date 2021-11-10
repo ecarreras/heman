@@ -48,24 +48,35 @@ class ScenarioReport(PVCalculatorResource):
             print("Error {}", e)
             return Response({}, mimetype='application/json')
 
-        scenario = min((
+        selectedScenarios = [
             scenario
             for i,scenario in enumerate(scenarios)
             if scenario['settings']['tilt'] == tiltDegrees
             and scenario['settings']['azimuth'] == azimuthDegrees
             and (scenario['settings']['power'] == powerKwh or not powerKwh)
-            ),
+        ]
+        if not selectedScenarios:
+            return Response(
+                json.dumps(dict(
+                    error='NOT_FOUND',
+                    message='Scenario not found',
+                )),
+                mimetype='application/json'
+            )
+
+        bestScenario = min(
+            selectedScenarios,
             key=lambda s: s['economics']['payback'],
         )
 
         result = dict(
             loadKwhYear = totalLoad,
-            productionKwhYear = scenario['generation']['total'],
-            productionToLoadKwhYear = scenario['generation']['PVtoLoad'],
-            productionToGridKwhYear = scenario['generation']['PVtoGrid'],
-            savingsEuroYear = scenario['generation']['savings'],
-            installationCostEuro = scenario['settings']['cost'],
-            paybackYears = scenario['economics']['payback'],
+            productionKwhYear = bestScenario['generation']['total'],
+            productionToLoadKwhYear = bestScenario['generation']['PVtoLoad'],
+            productionToGridKwhYear = bestScenario['generation']['PVtoGrid'],
+            savingsEuroYear = bestScenario['generation']['savings'],
+            installationCostEuro = bestScenario['settings']['cost'],
+            paybackYears = bestScenario['economics']['payback'],
         )
 
         return Response(json.dumps(result), mimetype='application/json')
