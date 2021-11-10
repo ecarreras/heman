@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import pymongo
 import unittest
 import mock
@@ -122,3 +123,26 @@ def test__scenario_report__parameter_value_not_found(api, scenario_data):
         'message': "Scenario not found",
     }
 
+def test__scenario_params(api, scenario_data):
+    contract, token = scenario_data
+    r = api.get('/api/ScenarioParams/{}'.format(contract),
+        headers=dict(
+            Authorization = 'token {}'.format(token)
+        ),
+    )
+
+    assert r.get_json() == {
+        'tilt': [15.0, 30.0],
+        'azimuth': [100.0, 140.0, 180.0, '100#280', '140#320', '180#0'],
+        'power':  [
+            '10.640 kWp',
+            '2.280 kWp',
+            '3.040 kWp',
+            '4.560 kWp',
+            '5.320 kWp',
+            '6.080 kWp',
+            '7.600 kWp',
+            '8.360 kWp',
+            '9.120 kWp',
+        ],
+    }

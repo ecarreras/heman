@@ -61,7 +61,7 @@ class ScenarioReport(PVCalculatorResource):
                     error='NOT_FOUND',
                     message='Scenario not found',
                 )),
-                mimetype='application/json'
+                mimetype='application/json',
             )
 
         bestScenario = min(
@@ -82,7 +82,41 @@ class ScenarioReport(PVCalculatorResource):
         return Response(json.dumps(result), mimetype='application/json')
 
 
+class ScenarioParams(PVCalculatorResource):
+
+    def get(self, contract):
+
+        scenario_report = self.get_last_scenario(contract_name=contract)
+        if not scenario_report:
+            return Response({}, mimetype='application/json')
+        
+        try:
+            scenarios = scenario_report['results']['pvAutoSize']['scenarios']
+        except KeyError as e:
+            print("Error {}", e)
+            return Response({}, mimetype='application/json')
+        except IndexError as e:
+            print("Error {}", e)
+            return Response({}, mimetype='application/json')
+
+        tilts, azimuths, powers = zip(*[
+            (
+            scenario['settings']['tilt'],
+            scenario['settings']['azimuth'],
+            scenario['settings']['power'],
+            )
+            for i,scenario in enumerate(scenarios)
+        ])
+        result = dict(
+            tilt = list(sorted(set(tilts))),
+            azimuth = list(sorted(set(azimuths))),
+            power = list(sorted(set(powers))),
+        )
+        return Response(json.dumps(result), mimetype='application/json')
+
 
 resources = [
     (ScenarioReport, '/ScenarioReport/<contract>'),
+    (ScenarioParams, '/ScenarioParams/<contract>'),
+
 ]
