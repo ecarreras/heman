@@ -1,4 +1,12 @@
-pymongo<4
+pymongo<3 # using old api
+#pymongo<4 # Py2, indirect
+importlib-metadata<3 # Py2, indirect pytest
+zipp<2 # Py2, indirect importlib-metadata
+configparser<5 # Py2, indirect importlib-metadata
+marshmallow<3 # Py2, indirect empowering
+arrow<1 # Py2, indirect empowering
+pytest<7 # Py2
+Flask<2 # Py2
 empowering
 amoniak
 Flask==1.0.2
