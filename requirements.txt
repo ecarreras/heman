@@ -1,8 +1,8 @@
 # Version restrictions needed to keep it working with Python 2 are marked Py2
 # Once Py2 support is droped all frozen indirect dependencies could be dropped
 
-pymongo<3 # using old api
-#pymongo<4 # Py2, indirect
+pymongo<3 # using old api, indirect flask-pymongo
+#pymongo<4 # Py2, indirect flask-pymongo
 contextlib2<21 # Py2, indirect by many libs
 packaging<21 # Py2, indirect importlib-metadata, zipp
 zipp<2 # Py2, indirect importlib-metadata
@@ -13,7 +13,9 @@ arrow<1 # Py2, indirect empowering
 click<8 # Py2, indirect pytest, flask
 pyparsing<3 # Py2, indirect ???
 MarkupSafe<2 # Py2, indirect jinja2 <- flask
+mock<4 # Py2
 pytest<5 # Py2
+pytest-cov<3 # Py2
 Flask<2 # Py2
 flask-pymongo<2 # further versions do not support pymongo<3
 empowering
