@@ -6,7 +6,7 @@ from flask import Flask
 from flask_pymongo import PyMongo
 from raven.contrib.flask import Sentry
 
-from heman.api import HemanAPI
+from .api import HemanAPI
 
 
 api = HemanAPI(prefix='/api')
