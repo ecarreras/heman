@@ -5,12 +5,15 @@ zipp<2 # Py2, indirect importlib-metadata
 configparser<5 # Py2, indirect importlib-metadata
 marshmallow<3 # Py2, indirect empowering
 arrow<1 # Py2, indirect empowering
+click<8 # Py2, indirect pytest, flask
+pyparsing<3 # Py2, indirect ???
+MarkupSafe<2 # Py2, indirect jinja2 <- flask
 pytest<7 # Py2
 Flask<2 # Py2
+flask-pymongo<2 # further versions do not support pymongo<3
 empowering
 amoniak
 Flask==1.0.2
-flask-pymongo
 flask-restful>=0.3.1,<0.4.0
 raven<5.2.0
 blinker
