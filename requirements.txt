@@ -1,3 +1,4 @@
+pymongo<4
 empowering
 amoniak
 Flask==1.0.2
