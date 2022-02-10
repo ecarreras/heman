@@ -13,6 +13,7 @@ marshmallow<3 # Py2, indirect empowering
 arrow<1 # Py2, indirect empowering
 click<8 # Py2, indirect pytest, flask
 MarkupSafe<2 # Py2, indirect jinja2 <- flask
+coverage<6 # Py2, indirect pytest-cov
 mock<4 # Py2
 pytest<5 # Py2
 pytest-cov<3 # Py2
