@@ -8,7 +8,7 @@ arrow<1 # Py2, indirect empowering
 click<8 # Py2, indirect pytest, flask
 pyparsing<3 # Py2, indirect ???
 MarkupSafe<2 # Py2, indirect jinja2 <- flask
-pytest<7 # Py2
+pytest<5 # Py2
 Flask<2 # Py2
 flask-pymongo<2 # further versions do not support pymongo<3
 empowering
