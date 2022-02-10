@@ -13,7 +13,6 @@ Flask<2 # Py2
 flask-pymongo<2 # further versions do not support pymongo<3
 empowering
 amoniak
-Flask==1.0.2
 flask-restful>=0.3.1,<0.4.0
 raven<5.2.0
 blinker
