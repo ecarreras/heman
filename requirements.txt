@@ -4,7 +4,7 @@
 pymongo<3 # using old api, indirect flask-pymongo
 #pymongo<4 # Py2, indirect flask-pymongo
 redis<4 # Py2, indirect rq
-rq<1.40 # Py2, indirect amoniak
+rq<1.4.0 # Py2, indirect amoniak
 contextlib2<21 # Py2, indirect by many libs
 pyparsing<3 # Py2, indirect packaging
 packaging<21 # Py2, indirect importlib-metadata, zipp
