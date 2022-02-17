@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 with open('requirements.txt', 'r') as req:
     INSTALL_REQUIRES = [x.strip() for x in req.readlines()]
 
-with open('README.rst', 'r') as desc:
+with open('README.md', 'r') as desc:
     readme = desc.read()
 
 setup(
