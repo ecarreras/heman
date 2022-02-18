@@ -40,7 +40,7 @@ jobs:
           redis-version: ${{ matrix.redis-version }}
       - name: Install dependencies
         run: |
-          pip install pytest-cov pytest
+          pip install -r requirements.txt # needed to use empowering and amoniak from git not from pypi
           ./setup.py develop
       - uses: BSFishy/pip-action@v1
         with:
