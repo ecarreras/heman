@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TRAVIS: 'true' # Skip tests requiring data
+      MONGO_URI: mongodb://localhost:27017/hamin
     strategy:
       matrix:
         python-version:
