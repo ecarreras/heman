@@ -23,9 +23,9 @@ pytest<5 # Py2
 pytest-cov<3 # Py2
 Flask<2 # Py2
 flask-pymongo<2 # further versions do not support pymongo<3
-git+https://github.com/gisce/empowering.git # version 1.15.4 not released in pypi
+empowering @ git+https://github.com/gisce/empowering.git@master#egg=empowering   # version 1.15.4 not released in pypi
 #empowering
-git+https://github.com/gisce/amoniak.git # las changes not in a release
+amoniak @ git+https://github.com/gisce/amoniak.git@master@egg=amoniak # las changes not in a release
 #amoniak
 flask-restful>=0.3.1,<0.4.0
 raven<5.2.0
