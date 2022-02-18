@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TRAVIS: 'true' # Skip tests requiring data
-      MONGO_URI: mongodb://localhost:27017/hamin
+      MONGO_URI: 'mongodb://localhost:27017/heman'
+      SENTRY_DSN: 'redis://localhost:6379'
     strategy:
       matrix:
         python-version:
