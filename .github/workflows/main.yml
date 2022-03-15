@@ -11,7 +11,7 @@ jobs:
     env:
       TRAVIS: 'true' # Skip tests requiring data
       MONGO_URI: 'mongodb://localhost:27017/heman'
-      SENTRY_DSN: 'http://localhost:6379'
+      #SENTRY_DSN: 'http://localhost:6379'
     strategy:
       matrix:
         python-version:
@@ -34,10 +34,10 @@ jobs:
         with:
           mongodb-version: ${{ matrix.mongodb-version }}
           mongodb-replica-set: test-rs
-      - name: Start Redis
-        uses: supercharge/redis-github-action@1.4.0
-        with:
-          redis-version: ${{ matrix.redis-version }}
+#      - name: Start Redis
+#        uses: supercharge/redis-github-action@1.4.0
+#        with:
+#          redis-version: ${{ matrix.redis-version }}
       - name: Install dependencies
         run: |
           pip install -r requirements.txt # needed to use empowering and amoniak from git not from pypi
