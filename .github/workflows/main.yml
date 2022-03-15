@@ -34,6 +34,8 @@ jobs:
         with:
           mongodb-version: ${{ matrix.mongodb-version }}
           mongodb-replica-set: test-rs
+      - name: Sentry
+        uses: getsentry/sentry
 #      - name: Start Redis
 #        uses: supercharge/redis-github-action@1.4.0
 #        with:
