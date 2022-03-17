@@ -11,8 +11,8 @@ packaging<21 # Py2, indirect importlib-metadata, zipp
 zipp<2 # Py2, indirect importlib-metadata
 configparser<5 # Py2, indirect importlib-metadata
 importlib-metadata<3 # Py2, indirect pytest
-#marshmallow==2.0.0rc2 # 'Select' dropped in favor of 'OneOf', indirect empowering
-marshmallow<3 # Py2, indirect empowering
+marshmallow==2.0.0rc2 # 'Select' dropped in favor of 'OneOf', indirect empowering
+#marshmallow<3 # Py2, indirect empowering
 arrow<1 # Py2, indirect empowering
 click<8 # Py2, indirect pytest, flask
 MarkupSafe<2 # Py2, indirect jinja2 <- flask
