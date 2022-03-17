@@ -44,15 +44,6 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-#     - name: Start MongoDB
-#       uses: supercharge/mongodb-github-action@1.7.0
-#       with:
-#         mongodb-version: ${{ matrix.mongodb-version }}
-#         mongodb-replica-set: test-rs
-#      - name: Start Redis
-#        uses: supercharge/redis-github-action@1.4.0
-#        with:
-#          redis-version: ${{ matrix.redis-version }}
       - name: Install dependencies
         run: |
           pip install -r requirements.txt # needed to use empowering and amoniak from git not from pypi
@@ -61,20 +52,14 @@ jobs:
         with:
           packages: |
             coveralls
-#      - name: Create config
-#        run: |
-#          echo "MONGO_URI='mongodb:'" >> heman.ini
-#          echo "SENTRY_DSN='whatever'" >> heman.ini
       - name: Unit tests
         run: |
           pytest
-
       - name: Coveralls
         uses: AndreMiras/coveralls-python-action@develop
         with:
           parallel: true
           flag-name: Unit tests
-
   coveralls_finish:
     needs: build
     runs-on: ubuntu-latest
