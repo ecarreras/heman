@@ -61,10 +61,10 @@ jobs:
         with:
           packages: |
             coveralls
-      - name: Create config
-        run: |
-          echo "MONGO_URI='mongodb:'" >> heman.ini
-          echo "SENTRY_DSN='whatever'" >> heman.ini
+#      - name: Create config
+#        run: |
+#          echo "MONGO_URI='mongodb:'" >> heman.ini
+#          echo "SENTRY_DSN='whatever'" >> heman.ini
       - name: Unit tests
         run: |
           pytest
