@@ -32,4 +32,5 @@ raven<5.2.0
 blinker
 flask-login<0.3.0
 flask-cors
+yamlns
 
