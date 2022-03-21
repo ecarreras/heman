@@ -26,6 +26,9 @@ class PVCalculatorResource(AuthorizedResource):
 
 class ScenarioReport(PVCalculatorResource):
 
+    """Given some parameter values chooses the matching scenario with least payback
+    """
+
     def get(self, contract):
         current_app.logger.debug('PVCalculator Report, contract {}'.format(contract))
 
@@ -71,18 +74,33 @@ class ScenarioReport(PVCalculatorResource):
 
         result = dict(
             loadKwhYear = totalLoad,
+            loadByPeriodKwh = scenario_report['results']['pvAutoSize']['load']['timeslots'],
             productionKwhYear = bestScenario['generation']['total'],
             productionToLoadKwhYear = bestScenario['generation']['PVtoLoad'],
+            productionToLoadEuroYear = bestScenario['generation']['PVtoLoadCost'],
+            productionToLoadPercent = bestScenario['generation']['PVtoLoadPct'],
             productionToGridKwhYear = bestScenario['generation']['PVtoGrid'],
+            productionToGridEuroYear = bestScenario['generation']['PVtoGridCost'],
+            productionToGridPercent = bestScenario['generation']['PVtoGridPct'],
+            loadFromGridKwhYear = bestScenario['generation']['loadFromGrid'],
             savingsEuroYear = bestScenario['generation']['savings'],
-            installationCostEuro = bestScenario['settings']['cost'],
             paybackYears = bestScenario['economics']['payback'],
+            installationCostEuro = bestScenario['settings']['cost'],
+            azimuthDegrees= bestScenario['settings']['azimuth'],
+            tiltDegrees= bestScenario['settings']['tilt'],
+            areaM2 = bestScenario['settings']['area'],
+            nModules = bestScenario['settings']['numModules'],
+            totalPower = bestScenario['settings']['power'],
+            dailyLoadProfileKwh = scenario_report['results']['pvAutoSize']['load']['profile'],
+            dailyProductionProfileKwh = bestScenario['generation']['profile'],
         )
 
         return Response(json.dumps(result), mimetype='application/json')
 
 
 class ScenarioParams(PVCalculatorResource):
+
+    """Returns the parameters available values to choose scenario"""
 
     def get(self, contract):
 
