@@ -93,6 +93,14 @@ class ScenarioReport(PVCalculatorResource):
             totalPower = bestScenario['settings']['power'],
             dailyLoadProfileKwh = scenario_report['results']['pvAutoSize']['load']['profile'],
             dailyProductionProfileKwh = bestScenario['generation']['profile'],
+            monthlyProductionToLoadKwh = bestScenario['generation']['monthlyPVtoLoad'],
+            monthlyProductionToLoadEuro = bestScenario['generation']['monthlyPVtoLoadCost'],
+            monthlyGridToLoadKwh = bestScenario['generation']['monthlyLoadFromGrid'],
+            monthlyGridToLoadEuro = bestScenario['generation']['monthlyLoadFromGridCost'],
+            monthlyProductionToGridKwh = bestScenario['generation']['monthlyPVtoGrid'],
+            monthlyProductionToGridEuro = bestScenario['generation']['monthlyPVtoGridCost'],
+            monthlyProductionKwh = bestScenario['generation']['monthlyPV'],
+            #monthlyProductionEuro = bestScenario['generation']['monthlyPVCost'], # TODO: Info not yet available
         )
 
         return Response(json.dumps(result), mimetype='application/json')
