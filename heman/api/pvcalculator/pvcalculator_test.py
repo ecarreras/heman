@@ -8,6 +8,10 @@ import json
 from ...config import create_app
 from ...auth import APIUser
 import os
+try:
+    from pathlib2 import Path
+except ImportError:
+    from pathlib import Path
 
 @pytest.fixture
 def snapshot(request):
@@ -26,22 +30,22 @@ def snapshot(request):
         return x
 
     def assertion(data, snapshot=None):
-        snapshotdir = 'testdata/snapshots/'
+        snapshotdir = Path('testdata/snapshots/')
         snapshot = snapshot or '.'.join([request.node.module.__name__, request.node.name])
-        snapshotfile = snapshotdir + snapshot
-        resultfile = snapshotfile + '.result'
+        snapshotfile = snapshotdir / (snapshot+'.expected')
+        resultfile = snapshotdir / (snapshot+'.result')
         ns(snapshot=normalize(data)).dump(resultfile)
-        assert os.path.exists(snapshotfile), (
+        assert snapshotfile.exists(), (
             "First snapshot, check results and accept them with:\n"
-            "mv {0}.result {0}".format(snapshotfile)
+            "mv {} {}".format(resultfile, snapshotfile)
         )
         expected = ns.load(snapshotfile)
-        assert file(resultfile).read() == file(snapshotfile).read(), (
+        assert resultfile.read_text(encoding='utf8') == snapshotfile.read_text('utf8'), (
             "Failed snapshot. Check the result and if it is ok accept it with:\n"
-            "mv {0}.result {0}".format(snapshotfile)
+            "mv {} {}".format(resultfile, snapshotfile)
         )
         # the result is keept if any of the former asserts fails
-        os.unlink(resultfile)
+        resultfile.unlink()
     return assertion
 
 @pytest.fixture
