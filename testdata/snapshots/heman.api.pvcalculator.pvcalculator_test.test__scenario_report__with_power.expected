@@ -153,6 +153,7 @@ snapshot:
   - 63.82
   nModules: 28.0
   paybackYears: 20.54521623587875
+  peakPowerKw: 10.64
   productionKwhYear: 12863.530773648346
   productionToGridEuroYear: 283.9833047153394
   productionToGridKwhYear: 11853.280996988628
@@ -162,4 +163,3 @@ snapshot:
   productionToLoadPercent: 7.891967334033866
   savingsEuroYear: 505.2692606181667
   tiltDegrees: 30.0
-  totalPower: 10.640 kWp

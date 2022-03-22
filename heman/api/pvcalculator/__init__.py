@@ -36,6 +36,13 @@ def parseMongoAzimuth(azimuth):
         return (int(azimuth),)
     return tuple(int(a) for a in azimuth.split('#'))
 
+def parseMongoPower(peakPower):
+    return float(peakPower.replace(' kWp', ''))
+
+def queryPeakPower(peakPower):
+    if not peakPower: return None
+    return float(peakPower)
+
 def queryAzimuth(queryAzimuth):
     """
     This turns a list of strings representing the azimuths into
@@ -53,7 +60,7 @@ class ScenarioReport(PVCalculatorResource):
 
         tiltDegrees = float(request.args.get('tilt'))
         azimuthDegrees = queryAzimuth(request.args.getlist('azimuth'))
-        powerKwh = request.args.get('power')
+        peakPowerKw = queryPeakPower(request.args.get('power'))
 
         scenario_report = self.get_last_scenario(contract_name=contract)
 
@@ -75,7 +82,7 @@ class ScenarioReport(PVCalculatorResource):
             for i,scenario in enumerate(scenarios)
             if scenario['settings']['tilt'] == tiltDegrees
             and parseMongoAzimuth(scenario['settings']['azimuth']) == azimuthDegrees
-            and (scenario['settings']['power'] == powerKwh or not powerKwh)
+            and (parseMongoPower(scenario['settings']['power']) == peakPowerKw or not peakPowerKw)
         ]
         if not selectedScenarios:
             return Response(
@@ -109,7 +116,7 @@ class ScenarioReport(PVCalculatorResource):
             tiltDegrees= bestScenario['settings']['tilt'],
             areaM2 = bestScenario['settings']['area'],
             nModules = bestScenario['settings']['numModules'],
-            totalPower = bestScenario['settings']['power'],
+            peakPowerKw = parseMongoPower(bestScenario['settings']['power']),
             dailyLoadProfileKwh = scenario_report['results']['pvAutoSize']['load']['profile'],
             dailyProductionProfileKwh = bestScenario['generation']['profile'],
             monthlyProductionToLoadKwh = bestScenario['generation']['monthlyPVtoLoad'],
@@ -148,7 +155,7 @@ class ScenarioParams(PVCalculatorResource):
             (
             scenario['settings']['tilt'],
             parseMongoAzimuth(scenario['settings']['azimuth']),
-            scenario['settings']['power'],
+            parseMongoPower(scenario['settings']['power']),
             )
             for i,scenario in enumerate(scenarios)
         ])

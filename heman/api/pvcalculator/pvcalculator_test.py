@@ -103,9 +103,9 @@ def test__scenario_report__with_power(api, scenario_data, snapshot):
     contract, token = scenario_data
     r = api.get('/api/ScenarioReport/{}'.format(contract),
         query_string=dict(
-            tilt=30.0,
-            azimuth=[180,0], # TODO: split both azimuths
-            power='10.640 kWp', # TODO: Remove units from value 
+            tilt='30.0',
+            azimuth=['180','0'],
+            power=10.64,
         ),
         headers=dict(
             Authorization = 'token {}'.format(token)
@@ -155,14 +155,14 @@ def test__scenario_params(api, scenario_data):
         'tilt': [15.0, 30.0],
         'azimuth': [[100], [100,280], [140], [140,320], [180], [180,0]],
         'power':  [
-            '10.640 kWp',
-            '2.280 kWp',
-            '3.040 kWp',
-            '4.560 kWp',
-            '5.320 kWp',
-            '6.080 kWp',
-            '7.600 kWp',
-            '8.360 kWp',
-            '9.120 kWp',
+            2.280,
+            3.040,
+            4.560,
+            5.320,
+            6.080,
+            7.600,
+            8.360,
+            9.120,
+            10.640,
         ],
     }
