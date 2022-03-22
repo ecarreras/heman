@@ -24,6 +24,25 @@ class PVCalculatorResource(AuthorizedResource):
         )
 
 
+def parseMongoAzimuth(azimuth):
+    """
+    This function turns mongo representation of azimuth into a int tuple.
+    Currently, Mongo objects represents azimuths either as a float like 120.0
+    or as a string like "120#300" when it is a gabled roof.
+    The first azimuth is always the one towards south or 90 if W-E orientation.
+    TODO: change the mongo representation to be a more uniform one.
+    """
+    if type(azimuth) is float:
+        return (int(azimuth),)
+    return tuple(int(a) for a in azimuth.split('#'))
+
+def queryAzimuth(queryAzimuth):
+    """
+    This turns a list of strings representing the azimuths into
+    a hashable tuple of ints.
+    """
+    return tuple(int(a) for a in queryAzimuth)
+
 class ScenarioReport(PVCalculatorResource):
 
     """Given some parameter values chooses the matching scenario with least payback
@@ -33,7 +52,7 @@ class ScenarioReport(PVCalculatorResource):
         current_app.logger.debug('PVCalculator Report, contract {}'.format(contract))
 
         tiltDegrees = float(request.args.get('tilt'))
-        azimuthDegrees = request.args.get('azimuth')
+        azimuthDegrees = queryAzimuth(request.args.getlist('azimuth'))
         powerKwh = request.args.get('power')
 
         scenario_report = self.get_last_scenario(contract_name=contract)
@@ -55,7 +74,7 @@ class ScenarioReport(PVCalculatorResource):
             scenario
             for i,scenario in enumerate(scenarios)
             if scenario['settings']['tilt'] == tiltDegrees
-            and scenario['settings']['azimuth'] == azimuthDegrees
+            and parseMongoAzimuth(scenario['settings']['azimuth']) == azimuthDegrees
             and (scenario['settings']['power'] == powerKwh or not powerKwh)
         ]
         if not selectedScenarios:
@@ -86,7 +105,7 @@ class ScenarioReport(PVCalculatorResource):
             savingsEuroYear = bestScenario['generation']['savings'],
             paybackYears = bestScenario['economics']['payback'],
             installationCostEuro = bestScenario['settings']['cost'],
-            azimuthDegrees= bestScenario['settings']['azimuth'],
+            azimuthDegrees= parseMongoAzimuth(bestScenario['settings']['azimuth']),
             tiltDegrees= bestScenario['settings']['tilt'],
             areaM2 = bestScenario['settings']['area'],
             nModules = bestScenario['settings']['numModules'],
@@ -128,7 +147,7 @@ class ScenarioParams(PVCalculatorResource):
         tilts, azimuths, powers = zip(*[
             (
             scenario['settings']['tilt'],
-            scenario['settings']['azimuth'],
+            parseMongoAzimuth(scenario['settings']['azimuth']),
             scenario['settings']['power'],
             )
             for i,scenario in enumerate(scenarios)

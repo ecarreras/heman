@@ -104,7 +104,7 @@ def test__scenario_report__with_power(api, scenario_data, snapshot):
     r = api.get('/api/ScenarioReport/{}'.format(contract),
         query_string=dict(
             tilt=30.0,
-            azimuth='180#0', # TODO: split both azimuths
+            azimuth=[180,0], # TODO: split both azimuths
             power='10.640 kWp', # TODO: Remove units from value 
         ),
         headers=dict(
@@ -118,7 +118,7 @@ def test__scenario_report__optimal_payback(api, scenario_data, snapshot):
     r = api.get('/api/ScenarioReport/{}'.format(contract),
         query_string=dict(
             tilt=30.0,
-            azimuth='180#0',
+            azimuth=[180,0],
         ),
         headers=dict(
             Authorization = 'token {}'.format(token)
@@ -131,7 +131,7 @@ def test__scenario_report__parameter_value_not_found(api, scenario_data):
     r = api.get('/api/ScenarioReport/{}'.format(contract),
         query_string=dict(
             tilt=31.0, # Value for tilt not found
-            azimuth='180#0',
+            azimuth=[180,0],
         ),
         headers=dict(
             Authorization = 'token {}'.format(token)
@@ -153,7 +153,7 @@ def test__scenario_params(api, scenario_data):
 
     assert r.get_json() == {
         'tilt': [15.0, 30.0],
-        'azimuth': [100.0, 140.0, 180.0, '100#280', '140#320', '180#0'],
+        'azimuth': [[100], [100,280], [140], [140,320], [180], [180,0]],
         'power':  [
             '10.640 kWp',
             '2.280 kWp',

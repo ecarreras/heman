@@ -1,6 +1,8 @@
 snapshot:
   areaM2: 1.87
-  azimuthDegrees: 180#0
+  azimuthDegrees:
+  - 180
+  - 0
   dailyLoadProfileKwh:
   - 0.24
   - 0.235
