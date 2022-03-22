@@ -30,7 +30,7 @@ def snapshot(request):
         snapshot = snapshot or '.'.join([request.node.module.__name__, request.node.name])
         snapshotfile = snapshotdir + snapshot
         resultfile = snapshotfile + '.result'
-        ns(normalize(data)).dump(resultfile)
+        ns(snapshot=normalize(data)).dump(resultfile)
         assert os.path.exists(snapshotfile), (
             "First snapshot, check results and accept them with:\n"
             "mv {0}.result {0}".format(snapshotfile)
@@ -40,6 +40,7 @@ def snapshot(request):
             "Failed snapshot. Check the result and if it is ok accept it with:\n"
             "mv {0}.result {0}".format(snapshotfile)
         )
+        # the result is keept if any of the former asserts fails
         os.unlink(resultfile)
     return assertion
 
