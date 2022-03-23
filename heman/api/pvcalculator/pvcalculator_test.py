@@ -8,45 +8,6 @@ import json
 from ...config import create_app
 from ...auth import APIUser
 import os
-try:
-    from pathlib2 import Path
-except ImportError:
-    from pathlib import Path
-
-@pytest.fixture
-def snapshot(request):
-    def normalize(x):
-        """Turns recursively all the dicts of a json like
-        structure into yamlns namespaces with their keys sorted
-        so that their dumps can be compared.
-        """
-        if isinstance(x, dict):
-            return ns((
-                (k, normalize(v))
-                for k,v in sorted(x.items())
-            ))
-        if isinstance(x, (list, tuple)):
-            return [i for i in x]
-        return x
-
-    def assertion(data, snapshot=None):
-        snapshotdir = Path('testdata/snapshots/')
-        snapshot = snapshot or '.'.join([request.node.module.__name__, request.node.name])
-        snapshotfile = snapshotdir / (snapshot+'.expected')
-        resultfile = snapshotdir / (snapshot+'.result')
-        ns(snapshot=normalize(data)).dump(resultfile)
-        assert snapshotfile.exists(), (
-            "First snapshot, check results and accept them with:\n"
-            "mv {} {}".format(resultfile, snapshotfile)
-        )
-        expected = ns.load(snapshotfile)
-        assert resultfile.read_text(encoding='utf8') == snapshotfile.read_text('utf8'), (
-            "Failed snapshot. Check the result and if it is ok accept it with:\n"
-            "mv {} {}".format(resultfile, snapshotfile)
-        )
-        # the result is keept if any of the former asserts fails
-        resultfile.unlink()
-    return assertion
 
 @pytest.fixture
 def api():
@@ -99,7 +60,7 @@ def scenario_data(mongodb):
     })
     yield contract, token
 
-def test__scenario_report__with_power(api, scenario_data, snapshot):
+def test__scenario_report__with_power(api, scenario_data, yaml_snapshot):
     contract, token = scenario_data
     r = api.get('/api/ScenarioReport/{}'.format(contract),
         query_string=dict(
@@ -111,9 +72,9 @@ def test__scenario_report__with_power(api, scenario_data, snapshot):
             Authorization = 'token {}'.format(token)
         ),
     )
-    snapshot(r.get_json())
+    yaml_snapshot(r.get_json())
 
-def test__scenario_report__optimal_payback(api, scenario_data, snapshot):
+def test__scenario_report__optimal_payback(api, scenario_data, yaml_snapshot):
     contract, token = scenario_data
     r = api.get('/api/ScenarioReport/{}'.format(contract),
         query_string=dict(
@@ -124,7 +85,7 @@ def test__scenario_report__optimal_payback(api, scenario_data, snapshot):
             Authorization = 'token {}'.format(token)
         ),
     )
-    snapshot(r.get_json())
+    yaml_snapshot(r.get_json())
 
 def test__scenario_report__parameter_value_not_found(api, scenario_data):
     contract, token = scenario_data
