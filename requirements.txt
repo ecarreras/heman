@@ -32,5 +32,5 @@ raven<5.2.0
 blinker
 flask-login<0.3.0
 flask-cors
-yamlns>=0.10.0
+yamlns>=0.10.0 # yaml_snapshot introduced in this version
 
