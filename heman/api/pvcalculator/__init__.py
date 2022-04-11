@@ -24,7 +24,7 @@ class PVCalculatorResource(AuthorizedResource):
         )
 
 
-def parseMongoAzimuth(azimuth):
+def parseMongoAzimuth(azimuth, gabledroof):
     """
     This function turns mongo representation of azimuth into a int tuple.
     Currently, Mongo objects represents azimuths either as a float like 120.0
@@ -32,12 +32,9 @@ def parseMongoAzimuth(azimuth):
     The first azimuth is always the one towards south or 90 if W-E orientation.
     TODO: change the mongo representation to be a more uniform one.
     """
-    if type(azimuth) is float:
+    if not gabledroof:
         return (int(azimuth),)
-    return tuple(int(a) for a in azimuth.split('#'))
-
-def parseMongoPower(peakPower):
-    return float(peakPower.replace(' kWp', ''))
+    return (int(azimuth), int((azimuth+180) % 360))
 
 def queryPeakPower(peakPower):
     if not peakPower: return None
@@ -81,8 +78,11 @@ class ScenarioReport(PVCalculatorResource):
             scenario
             for i,scenario in enumerate(scenarios)
             if scenario['settings']['tilt'] == tiltDegrees
-            and parseMongoAzimuth(scenario['settings']['azimuth']) == azimuthDegrees
-            and (parseMongoPower(scenario['settings']['power']) == peakPowerKw or not peakPowerKw)
+            and parseMongoAzimuth(
+                scenario['settings']['azimuth'],
+                scenario['settings']['gabledroof']
+                ) == azimuthDegrees
+            and (scenario['settings']['power'] == peakPowerKw or not peakPowerKw)
         ]
         if not selectedScenarios:
             return Response(
@@ -112,11 +112,14 @@ class ScenarioReport(PVCalculatorResource):
             savingsEuroYear = bestScenario['generation']['savings'],
             paybackYears = bestScenario['economics']['payback'],
             installationCostEuro = bestScenario['settings']['cost'],
-            azimuthDegrees= parseMongoAzimuth(bestScenario['settings']['azimuth']),
+            azimuthDegrees= parseMongoAzimuth(
+                bestScenario['settings']['azimuth'],
+                bestScenario['settings']['gabledroof']
+            ),
             tiltDegrees= bestScenario['settings']['tilt'],
             areaM2 = bestScenario['settings']['area'],
             nModules = bestScenario['settings']['numModules'],
-            peakPowerKw = parseMongoPower(bestScenario['settings']['power']),
+            peakPowerKw = bestScenario['settings']['power'],
             dailyLoadProfileKwh = scenario_report['results']['pvAutoSize']['load']['profile'],
             dailyProductionProfileKwh = bestScenario['generation']['profile'],
             monthlyProductionToLoadKwh = bestScenario['generation']['monthlyPVtoLoad'],
@@ -154,8 +157,11 @@ class ScenarioParams(PVCalculatorResource):
         tilts, azimuths, powers = zip(*[
             (
             scenario['settings']['tilt'],
-            parseMongoAzimuth(scenario['settings']['azimuth']),
-            parseMongoPower(scenario['settings']['power']),
+            parseMongoAzimuth(
+                scenario['settings']['azimuth'],
+                scenario['settings']['gabledroof']
+            ),
+            scenario['settings']['power'],
             )
             for i,scenario in enumerate(scenarios)
         ])

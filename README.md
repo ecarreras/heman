@@ -26,6 +26,17 @@ MONGO_URI=mongodb://localhost python run_api.py
 
 ```
 
+Updating the 
+
+## Test data
+
+To obtain test data:
+
+curl 'https://api.beedataanalytics.com/v1/components?where="contractId"=="XXXXXXX" and "type"=="FV"'
+
+curl 'https://api.beedataanalytics.com/authn/login' 
+
+
 ## TODO
 
 - Discovering tests from heman/ fails since the api is created twice
