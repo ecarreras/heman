@@ -19,8 +19,11 @@ def check_contract_allowed(func):
     @wraps(func)
     def decorator(*args, **kwargs):
         contract = kwargs.get('contract')
-        if (contract and current_user.is_authenticated()
-                and not current_user.allowed(contract)):
+        if (
+            contract
+            and current_user.is_authenticated()
+            and not current_user.allowed(contract)
+        ):
             return current_app.login_manager.unauthorized()
         return func(*args, **kwargs)
     return decorator
@@ -32,8 +35,11 @@ def check_cups_allowed(func):
     @wraps(func)
     def decorator(*args, **kwargs):
         cups = kwargs.get('cups')
-        if (cups and current_user.is_authenticated()
-                and not current_user.allowed(cups, 'cups')):
+        if (
+            cups
+            and current_user.is_authenticated()
+            and not current_user.allowed(cups, 'cups')
+        ):
             return current_app.login_manager.unauthorized()
         return func(*args, **kwargs)
     return decorator
