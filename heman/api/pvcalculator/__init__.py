@@ -23,6 +23,10 @@ class PVCalculatorResource(AuthorizedResource):
             sort=[('id', pymongo.DESCENDING)]
         )
 
+def timeSerie(curve):
+    if type(curve) == list:
+        return curve
+    return curve['values']
 
 def parseMongoAzimuth(azimuth, gabledroof):
     """
@@ -131,15 +135,15 @@ class ScenarioReport(PVCalculatorResource):
             areaM2 = bestScenario['settings']['area'],
             nModules = bestScenario['settings']['numModules'],
             peakPowerKw = bestScenario['settings']['power'],
-            dailyLoadProfileKwh = scenario_report['results']['pvAutoSize']['load']['profile'],
-            dailyProductionProfileKwh = bestScenario['generation']['profile'],
-            monthlyProductionToLoadKwh = bestScenario['generation']['monthlyPVtoLoad'],
-            monthlyProductionToLoadEuro = bestScenario['generation']['monthlyPVtoLoadCost'],
-            monthlyGridToLoadKwh = bestScenario['generation']['monthlyLoadFromGrid'],
-            monthlyGridToLoadEuro = bestScenario['generation']['monthlyLoadFromGridCost'],
-            monthlyProductionToGridKwh = bestScenario['generation']['monthlyPVtoGrid'],
-            monthlyProductionToGridEuro = bestScenario['generation']['monthlyPVtoGridCost'],
-            monthlyProductionKwh = bestScenario['generation']['monthlyPV'],
+            dailyLoadProfileKwh = timeSerie(scenario_report['results']['pvAutoSize']['load']['profile']),
+            dailyProductionProfileKwh = timeSerie(bestScenario['generation']['profile']),
+            monthlyProductionToLoadKwh = timeSerie(bestScenario['generation']['monthlyPVtoLoad']),
+            monthlyProductionToLoadEuro = timeSerie(bestScenario['generation']['monthlyPVtoLoadCost']),
+            monthlyGridToLoadKwh = timeSerie(bestScenario['generation']['monthlyLoadFromGrid']),
+            monthlyGridToLoadEuro = timeSerie(bestScenario['generation']['monthlyLoadFromGridCost']),
+            monthlyProductionToGridKwh = timeSerie(bestScenario['generation']['monthlyPVtoGrid']),
+            monthlyProductionToGridEuro = timeSerie(bestScenario['generation']['monthlyPVtoGridCost']),
+            monthlyProductionKwh = timeSerie(bestScenario['generation']['monthlyPV']),
             #monthlyProductionEuro = bestScenario['generation']['monthlyPVCost'], # TODO: Info not yet available
         )
 
