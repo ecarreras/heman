@@ -1,7 +1,7 @@
 import json
 import pymongo
 
-from flask import current_app, jsonify, Response
+from flask import current_app
 from flask_restful import request
 
 from heman.api import AuthorizedResource
@@ -15,7 +15,7 @@ class PVCalculatorResource(AuthorizedResource):
     )
 
     def options(self, *args, **kwargs):
-        return jsonify({})
+        return {}
 
     def get_last_scenario(self, contract_name):
         return mongo.db['photovoltaic_reports'].find_one(
@@ -62,17 +62,17 @@ class ScenarioReport(PVCalculatorResource):
         scenario_report = self.get_last_scenario(contract_name=contract)
 
         if not scenario_report:
-            return Response({}, mimetype='application/json')
+            return {}
 
         try:
             scenarios = scenario_report['results']['pvAutoSize']['scenarios']
             totalLoad = scenario_report['results']['pvAutoSize']['load']['total']
         except KeyError as e:
             print("Error {}", e)
-            return Response({}, mimetype='application/json')
+            return {}
         except IndexError as e:
             print("Error {}", e)
-            return Response({}, mimetype='application/json')
+            return {}
 
         selectedScenarios = [
             scenario
@@ -85,12 +85,9 @@ class ScenarioReport(PVCalculatorResource):
             and (scenario['settings']['power'] == peakPowerKw or not peakPowerKw)
         ]
         if not selectedScenarios:
-            return Response(
-                json.dumps(dict(
-                    error='NOT_FOUND',
-                    message='Scenario not found',
-                )),
-                mimetype='application/json',
+            return dict(
+                error='NOT_FOUND',
+                message='Scenario not found',
             )
 
         bestScenario = min(
@@ -132,7 +129,7 @@ class ScenarioReport(PVCalculatorResource):
             #monthlyProductionEuro = bestScenario['generation']['monthlyPVCost'], # TODO: Info not yet available
         )
 
-        return Response(json.dumps(result), mimetype='application/json')
+        return result
 
 
 class ScenarioParams(PVCalculatorResource):
@@ -143,16 +140,16 @@ class ScenarioParams(PVCalculatorResource):
 
         scenario_report = self.get_last_scenario(contract_name=contract)
         if not scenario_report:
-            return Response({}, mimetype='application/json')
+            return {}
         
         try:
             scenarios = scenario_report['results']['pvAutoSize']['scenarios']
         except KeyError as e:
             print("Error {}", e)
-            return Response({}, mimetype='application/json')
+            return {}
         except IndexError as e:
             print("Error {}", e)
-            return Response({}, mimetype='application/json')
+            return {}
 
         tilts, azimuths, powers = zip(*[
             (
@@ -170,7 +167,7 @@ class ScenarioParams(PVCalculatorResource):
             azimuth = list(sorted(set(azimuths))),
             power = list(sorted(set(powers))),
         )
-        return Response(json.dumps(result), mimetype='application/json')
+        return result
 
 
 resources = [
