@@ -1,0 +1,38 @@
+# Version restrictions needed to keep it working with Python 2 are marked Py2
+# Once Py2 support is droped all frozen indirect dependencies could be dropped
+
+setuptools<58 # use_2to3 dropped, in pymongo indirect flask-pymongo. Should be installed before requirements.txt
+mongo<4 # api changes, required mongo>=3 against amoniak requirements
+
+#pymongo<3 # using old api, indirect flask-pymongo
+##pymongo<4 # Py2, indirect flask-pymongo
+#redis<4 # Py2, indirect rq
+#rq<1.4.0 # Py2, indirect amoniak
+#contextlib2<21 # Py2, indirect by many libs
+#pyparsing<3 # Py2, indirect packaging
+#packaging<21 # Py2, indirect importlib-metadata, zipp
+#zipp<2 # Py2, indirect importlib-metadata
+#configparser<5 # Py2, indirect importlib-metadata
+#importlib-metadata<3 # Py2, indirect pytest
+##marshmallow==2.0.0rc2 # 'Select' dropped in favor of 'OneOf', indirect empowering
+#marshmallow<3 # Py2, indirect empowering
+#arrow<1 # Py2, indirect empowering
+#click<8 # Py2, indirect pytest, flask
+#MarkupSafe<2 # Py2, indirect jinja2 <- flask
+#coverage<6 # Py2, indirect pytest-cov
+
+#empowering # version 1.15.4 not released in pypi
+empowering@git+https://github.com/gisce/empowering@v0.15.4#egg=empowering-0.15.4
+#amoniak   # last changes not in a release
+amoniak@git+https://github.com/gisce/amoniak@master#egg=amoniak-0.9.2
+mock
+pytest
+pytest-cov
+Flask
+flask-pymongo
+flask-restful
+raven
+blinker
+flask-login
+flask-cors
+yamlns
