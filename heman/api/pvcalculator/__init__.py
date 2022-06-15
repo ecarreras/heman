@@ -106,7 +106,7 @@ class ScenarioReport(PVCalculatorResource):
             for i,scenario in enumerate(scenarios)
             if parseTilt(scenario['settings']) == tiltDegrees
             and parseMongoAzimuthFromSettings(scenario['settings']) == azimuthDegrees
-            and (parsePower(scenario['settings']) == peakPowerKw or not peakPowerKw)
+            and (not peakPowerKw or parsePower(scenario['settings']) == peakPowerKw)
         ]
         if not selectedScenarios:
             return dict(
@@ -137,7 +137,7 @@ class ScenarioReport(PVCalculatorResource):
             tiltDegrees= parseTilt(bestScenario['settings']),
             areaM2 = bestScenario['settings']['area'],
             nModules = bestScenario['settings']['numModules'],
-            peakPowerKw = parsePower(bestScenario['settings']['power']),
+            peakPowerKw = parsePower(bestScenario['settings']),
             dailyLoadProfileKwh = timeSerie(scenario_report['results']['pvAutoSize']['load']['profile']),
             dailyProductionProfileKwh = timeSerie(bestScenario['generation']['profile']),
             monthlyProductionToLoadKwh = timeSerie(bestScenario['generation']['monthlyPVtoLoad']),
