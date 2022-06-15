@@ -50,7 +50,7 @@ jobs:
             pip install -r requirements.txt # needed to use empowering and amoniak from git not from pypi
             ./setup.py develop
           else
-            pip install setuptools<58 # use_2to3 dropped, in pymongo indirect flask-pymongo. Should be installed before requirements.txt
+            pip install "setuptools<58" # use_2to3 dropped, in pymongo indirect flask-pymongo. Should be installed before requirements.txt
             pip install -r requirements-py3.txt # needed to use empowering and amoniak from git not from pypi
             ./setup.py develop
           fi
