@@ -1,45 +1,56 @@
 # He-Man
 
-Uses the Empowering Sword (a.k.a Empowering Proxy API for users).
+⚔ Uses the Empowering Sword (a.k.a Empowering Proxy API for users).
 
-He-Man provides an authentified API to access several information regarding Som Energia users stored as objects in monogdb.
+## Features
+
+He-Man provides an authentified API to access several information regarding Som Energia.
 
 - CCH curves from distribution
-- Photovoltaic simulations
 - Infoenergia profiles
 
-## Develoment Deployment
+## Development
 
-```bash
-# In different consoles run
-docker run -it --rm -p 27017:27017 mongo
-docker run -it --rm -p 6379:6379 redis
+### Setup
 
-# then in your main one
+#### Install application dependencies
+```shell
 ./setup.py develop
-
-# to run the test
-pytest
-
-# to deploy locally
-MONGO_URI=mongodb://localhost python run_api.py
-
 ```
 
-Updating the 
+#### Infrastructure virtualization
+In order to run the application and infrastructure dependencies locally
+we can use Docker to launch a mongo and redis servers:
 
-## Test data
+```bash
+docker run -it --rm -p 27017:27017 mongo
+docker run -it --rm -p 6379:6379 redis
+```
 
-To obtain test data:
+### Tests
 
+#### Data
+
+Providers:
+
+```shell
 curl 'https://api.beedataanalytics.com/v1/components?where="contractId"=="XXXXXXX" and "type"=="FV"'
+curl 'https://api.beedataanalytics.com/auth/login'
+```
 
-curl 'https://api.beedataanalytics.com/authn/login' 
 
+#### Execution
+```bash
+pytest tests/
+```
+
+
+## Usage
+```shell
+MONGO_URI=mongodb://localhost python run_api.py
+```
 
 ## TODO
 
 - Discovering tests from heman/ fails since the api is created twice
 - Py3: Migrate to sentry-sdk, since raven library raven library is not Py3.
-
-
