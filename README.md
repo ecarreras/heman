@@ -4,7 +4,7 @@
 
 ## Features
 
-He-Man provides an authentified API to access several information regarding Som Energia.
+He-Man provides an authenticated API to access several information regarding Som Energia.
 
 - CCH curves from distribution
 - Infoenergia profiles
@@ -35,7 +35,7 @@ Providers:
 
 ```shell
 curl 'https://api.beedataanalytics.com/v1/components?where="contractId"=="XXXXXXX" and "type"=="FV"'
-curl 'https://api.beedataanalytics.com/auth/login'
+curl 'https://api.beedataanalytics.com/authn/login'
 ```
 
 
