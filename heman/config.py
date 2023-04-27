@@ -62,7 +62,6 @@ def configure_api(app):
     """
     from heman.api.cch import resources as cch_resources
     from heman.api.infoenergia import resources as infoenergia_resources
-    from heman.api.pvcalculator import resources as pvcalculator_resources
     from heman.api import ApiCatchall
 
     # Add CCHFact resources
@@ -71,10 +70,6 @@ def configure_api(app):
 
     # Add InfoEnergia resources
     for resource in infoenergia_resources:
-        api.add_resource(*resource)
-
-    # Add PVCalculator resources
-    for resource in pvcalculator_resources:
         api.add_resource(*resource)
 
     api.add_resource(ApiCatchall, '/<path:path>')
