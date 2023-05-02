@@ -1,11 +1,13 @@
-from yamlns import ns
-
+from mock import patch
 from testdata.curves import (
     tg_cchfact_existing_points,
     tg_cchfact_NOT_existing_points_BUT_f1,
 )
 
+from yamlns import ns
+
 from heman.app import application
+from heman.api.cch import CCHFact
 
 
 class TestCchRequest(object):
@@ -54,6 +56,30 @@ class TestCchRequest(object):
         )
 
         assert response.status_code == 200
+
+        yaml_snapshot(ns(
+            status=response.status,
+            json=response.json,
+        ))
+
+    def test_no_curves_data(self, yaml_snapshot):
+        token = tg_cchfact_NOT_existing_points_BUT_f1['token']
+        cups = tg_cchfact_NOT_existing_points_BUT_f1['cups']
+        date = tg_cchfact_NOT_existing_points_BUT_f1['date']
+        endpoint_url = '/api/CCHFact/{cups}/{date}'.format(
+            cups=cups,
+            date=date
+        )
+        client = application.test_client()
+        headers = dict(
+            Authorization='token {token}'.format(token=token)
+        )
+
+        with patch.object(CCHFact, '_query_result_length', return_value=0):
+            response = client.get(
+                endpoint_url,
+                headers=headers
+            )
 
         yaml_snapshot(ns(
             status=response.status,
