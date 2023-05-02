@@ -71,7 +71,6 @@ class CCHFact(CCHResource):
             interval = 12
         end = datetime.strptime(period, '%Y%m') + relativedelta(months=1)
         start = end - relativedelta(months=interval)
-        result = []
         current_app.logger.debug('CCH from {} to {}'.format(start, end))
         search_query = {
             'name': {'$regex': '^{}'.format(cups[:20])},
@@ -86,11 +85,11 @@ class CCHFact(CCHResource):
         cursor_f1 = self.get_cursor_db(collection='tg_f1', query=search_query)
         cursor_p1 = self.get_cursor_db(collection='tg_p1', query=p1_search_query)
 
+        result = []
         if self._query_result_length(cursor_f5d) > 0:
             for curve in cursor_f5d:
                 result.append(self._curve_value(curve, 'W'))
-
-        if self._query_result_length(cursor_f1) > 0 \
+        elif self._query_result_length(cursor_f1) > 0 \
                 or self._query_result_length(cursor_p1) > 0:
             result = self.ordered_merge(cursor_f1, cursor_p1)
 
