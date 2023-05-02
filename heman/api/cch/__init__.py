@@ -71,7 +71,7 @@ class CCHFact(CCHResource):
             interval = 12
         end = datetime.strptime(period, '%Y%m') + relativedelta(months=1)
         start = end - relativedelta(months=interval)
-        res = []
+        result = []
         current_app.logger.debug('CCH from {} to {}'.format(start, end))
         search_query = {
             'name': {'$regex': '^{}'.format(cups[:20])},
@@ -88,13 +88,13 @@ class CCHFact(CCHResource):
 
         if self._query_result_length(cursor_f5d) > 0:
             for curve in cursor_f5d:
-                res.append(self._curve_value(curve, 'W'))
+                result.append(self._curve_value(curve, 'W'))
 
         if self._query_result_length(cursor_f1) > 0 \
                 or self._query_result_length(cursor_p1) > 0:
-            res = self.ordered_merge(cursor_f1, cursor_p1)
+            result = self.ordered_merge(cursor_f1, cursor_p1)
 
-        return Response(json.dumps(res), mimetype='application/json')
+        return Response(json.dumps(result), mimetype='application/json')
 
 
 resources = [
