@@ -60,6 +60,9 @@ class CCHFact(CCHResource):
 
         return curves
 
+    def _query_result_length(self, result):
+        return result.count()
+
     def get(self, cups, period):
         interval = request.args.get('interval')
         try:
@@ -83,11 +86,12 @@ class CCHFact(CCHResource):
         cursor_f1 = self.get_cursor_db(collection='tg_f1', query=search_query)
         cursor_p1 = self.get_cursor_db(collection='tg_p1', query=p1_search_query)
 
-        # Forcing local timezone
-        if cursor_f5d.count() > 0:
+        if self._query_result_length(cursor_f5d) > 0:
             for curve in cursor_f5d:
                 res.append(self._curve_value(curve, 'W'))
-        elif cursor_f1.count() > 0 or cursor_p1.count() > 0:
+
+        if self._query_result_length(cursor_f1) > 0 \
+                or self._query_result_length(cursor_p1) > 0:
             res = self.ordered_merge(cursor_f1, cursor_p1)
 
         return Response(json.dumps(res), mimetype='application/json')
