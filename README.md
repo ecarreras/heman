@@ -41,13 +41,17 @@ curl 'https://api.beedataanalytics.com/authn/login'
 
 #### Execution
 ```bash
+export POSTGRESQL_URI=postgresql://user:password@host:port/dbname; \
+export MONGO_URI=mongodb://user:password@host:port/dbname; \
 pytest tests/
 ```
 
 
 ## Usage
 ```shell
-MONGO_URI=mongodb://localhost python run_api.py
+export POSTGRESQL_URI=postgresql://user:password@host:port/dbname; \
+export MONGO_URI=mongodb://user:password@host:port/dbname; \
+python run_api.py
 ```
 
 ## TODO
