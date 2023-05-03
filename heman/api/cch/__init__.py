@@ -10,6 +10,31 @@ from heman.api import AuthorizedResource
 from heman.auth import check_cups_allowed
 from heman.config import mongo
 
+from .mongo_curve_backend import MongoCurveBackend
+
+
+class CurveRepository:
+    extra_filter = dict()
+
+    def __init__(self, backend):
+        self.backend = backend
+
+    def get_curve(self, start, end, cups=None):
+        return self.backend.get_curve(self, start, end, cups)
+
+
+class TgCchF5dRepository(CurveRepository):
+    model = 'tg_cchfact'
+
+
+class TgCchF1Repository(CurveRepository):
+    model = 'tg_f1'
+
+
+class TgCchP1Repository(CurveRepository):
+    model = 'tg_p1'
+
+
 
 class CCHResource(AuthorizedResource):
     method_decorators = (
@@ -76,7 +101,9 @@ class CCHFact(CCHResource):
             interval = 12
         end = datetime.strptime(period, '%Y%m') + relativedelta(months=1)
         start = end - relativedelta(months=interval)
+
         current_app.logger.debug('CCH from {} to {}'.format(start, end))
+
         search_query = {
             'name': {'$regex': '^{}'.format(cups[:20])},
             'datetime': {'$gte': start, '$lt': end}
@@ -86,7 +113,8 @@ class CCHFact(CCHResource):
             'datetime': {'$gte': start, '$lt': end},
             'type': P1_CURVE_TYPE
         }
-        cursor_f5d = self.get_cursor_db(collection='tg_cchfact', query=search_query)
+
+        cursor_f5d = self.get_curve('tg_cchfact', start, end, cups)
         cursor_f1 = self.get_cursor_db(collection='tg_f1', query=search_query)
         cursor_p1 = self.get_cursor_db(collection='tg_p1', query=p1_search_query)
 
@@ -99,6 +127,33 @@ class CCHFact(CCHResource):
 
         return Response(json.dumps(result), mimetype='application/json')
 
+    def get_curve(self, curve_type, start, end, cups):
+        repository = self.create_repository(curve_type)
+        return repository.get_curve(start, end, cups=cups)
+
+    def create_repository(self, curve_type):
+        CurveType = curve_types[curve_type]
+        # curve_type_backends = config.CURVE_TYPE_BACKENDS
+        curve_type_backends = {'tg_cchfact': 'mongo'}
+        # backend_name = curve_type_backends.get(
+        #     curve_type, config.CURVE_TYPE_DEFAULT_BACKEND
+        # )
+        backend_name = curve_type_backends.get(
+            curve_type, 'mongo'
+        )
+        Backend = curve_backends[backend_name]
+        return CurveType(Backend())
+
+
+curve_types = {
+    'tg_cchfact': TgCchF5dRepository,
+    'tg_p1': TgCchP1Repository,
+    'tg_f1': TgCchF1Repository,
+}
+
+curve_backends = dict(
+    mongo=MongoCurveBackend,
+)
 
 resources = [
     (CCHFact, '/CCHFact/<cups>/<period>')
