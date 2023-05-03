@@ -11,6 +11,7 @@ from heman.auth import check_cups_allowed
 from heman.config import mongo
 
 from .mongo_curve_backend import MongoCurveBackend
+from .timescale_curve_backend import TimescaleCurveBackend
 
 
 class CurveRepository:
@@ -33,7 +34,6 @@ class TgCchF1Repository(CurveRepository):
 
 class TgCchP1Repository(CurveRepository):
     model = 'tg_p1'
-
 
 
 class CCHResource(AuthorizedResource):
@@ -134,7 +134,10 @@ class CCHFact(CCHResource):
     def create_repository(self, curve_type):
         CurveType = curve_types[curve_type]
         # curve_type_backends = config.CURVE_TYPE_BACKENDS
-        curve_type_backends = {'tg_cchfact': 'mongo'}
+        curve_type_backends = {
+            'tg_cchfact': 'mongo',
+            'tg_f1': 'timescale'
+        }
         # backend_name = curve_type_backends.get(
         #     curve_type, config.CURVE_TYPE_DEFAULT_BACKEND
         # )
@@ -153,6 +156,7 @@ curve_types = {
 
 curve_backends = dict(
     mongo=MongoCurveBackend,
+    timescale=TimescaleCurveBackend,
 )
 
 resources = [
