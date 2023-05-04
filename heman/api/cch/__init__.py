@@ -114,14 +114,15 @@ class CCHFact(CCHResource):
             'type': P1_CURVE_TYPE
         }
 
-        cursor_f5d = self.get_curve('tg_cchfact', start, end, cups)
-        cursor_f1 = self.get_cursor_db(collection='tg_f1', query=search_query)
-        cursor_p1 = self.get_cursor_db(collection='tg_p1', query=p1_search_query)
-
         result = []
+        cursor_f5d = self.get_curve('tg_cchfact', start, end, cups)
         if self._query_result_length(cursor_f5d) > 0:
             result = [self._curve_value(curve, WATT) for curve in cursor_f5d]
-        elif self._query_result_length(cursor_f1) > 0 \
+            return Response(json.dumps(result), mimetype='application/json')
+
+        cursor_f1 = self.get_cursor_db(collection='tg_f1', query=search_query)
+        cursor_p1 = self.get_cursor_db(collection='tg_p1', query=p1_search_query)
+        if self._query_result_length(cursor_f1) > 0 \
                 or self._query_result_length(cursor_p1) > 0:
             result = self.ordered_merge(cursor_f1, cursor_p1)
 
