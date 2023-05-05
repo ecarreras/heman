@@ -18,6 +18,7 @@ click<8 # Py2, indirect pytest, flask
 MarkupSafe<2 # Py2, indirect jinja2 <- flask
 coverage<6 # Py2, indirect pytest-cov
 psycopg2-binary==2.8.6
+somutils
 
 #empowering # version 1.15.4 not released in pypi
 empowering@git+https://github.com/gisce/empowering@v0.15.4#egg=empowering-0.15.4

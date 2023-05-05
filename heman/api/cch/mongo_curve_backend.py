@@ -3,9 +3,11 @@ from pymongo import ASCENDING
 
 
 class MongoCurveBackend:
+    def __init__(self, mongodb=None):
+        self._mongodb = mongodb or mongo.db
 
     def get_cursor_db(self, collection, query):
-        return mongo.db[collection].find(
+        return self._mongodb[collection].find(
             query,
             fields={'_id': False, 'datetime': True, 'ai': True}).sort(
             'datetime', ASCENDING

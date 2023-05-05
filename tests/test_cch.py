@@ -1,3 +1,5 @@
+import os
+
 import pytest
 from mock import patch
 from testdata.curves import (
@@ -6,9 +8,12 @@ from testdata.curves import (
 )
 
 from yamlns import ns
+from somutils.isodates import localisodate
 
 from heman.app import application
 from heman.api.cch import CCHFact
+from heman.api.cch import TgCchF1Repository
+from heman.api.cch.mongo_curve_backend import MongoCurveBackend
 
 
 @pytest.fixture()
@@ -85,3 +90,28 @@ class TestCchRequest(object):
             status=response.status,
             json=response.json,
         ))
+
+def get_mongo_instance():
+    f = get_mongo_instance
+    if not hasattr(f, 'instance'):
+        from pymongo import MongoClient
+        f.instance = MongoClient(os.environ.get('MONGO_URI'))
+    return f.instance.somenergia
+
+class TestMongoCurveBackend(object):
+    def test_get_curve_f1_foo(self, yaml_snapshot):
+
+        mongo_curve_backend = MongoCurveBackend(get_mongo_instance())
+
+        result = mongo_curve_backend.get_curve(
+            curve_type=TgCchF1Repository(mongo_curve_backend),
+            start=localisodate('2019-09-21'),
+            end=localisodate('2019-09-22'),
+
+            cups=tg_cchfact_NOT_existing_points_BUT_f1['cups'],
+        )
+
+        yaml_snapshot(ns(
+            result=[x for x in result]
+        ))
+

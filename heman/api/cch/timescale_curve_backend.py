@@ -1,5 +1,7 @@
 from heman.erpdb_manager import get_timescale_connection
 
+from somutils.dbutils import fetchNs
+from somutils.isodates import toLocal, asUtc
 
 class TimescaleCurveBackend:
     def __init__(self):
@@ -13,15 +15,20 @@ class TimescaleCurveBackend:
         **extra_filter
     ):
 
+
+        def from_naive_localdate_to_naiveutc_datetime(naive_localdate):
+            return asUtc(toLocal(naive_localdate)).replace(tzinfo=None)
+            #return naive_localdate
+
         result = []
         with self.db_connection as connection:
             cursor = connection.cursor()
             if cups:
                 result += [cursor.mogrify("name ILIKE %s", [cups[:20] + "%"])]
             if start:
-                result += [cursor.mogrify("utc_timestamp >= %s", [start])]
+                result += [cursor.mogrify("utc_timestamp >= %s", [from_naive_localdate_to_naiveutc_datetime(start)])]
             if end:
-                result += [cursor.mogrify("utc_timestamp <= %s", [end])]
+                result += [cursor.mogrify("utc_timestamp < %s", [from_naive_localdate_to_naiveutc_datetime(end)])]
             for key, value in extra_filter.items():
                 result += [cursor.mogrify("{key} = %s".format(key=key), [value])]
         return result
@@ -44,4 +51,4 @@ class TimescaleCurveBackend:
                 model=curve_type.model,
                 where_clause=where_clause,
             ))
-            return cursor.fetchall()
+            return fetchNs(cursor)
