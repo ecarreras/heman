@@ -104,29 +104,28 @@ class CCHFact(CCHResource):
 
         current_app.logger.debug('CCH from {} to {}'.format(start, end))
 
+        result = []
+        cursor_f5d = self.get_curve('tg_cchfact', start, end, cups)
+        result = [self._curve_value(curve, WATT) for curve in cursor_f5d]
+        if result:
+            return Response(json.dumps(result), mimetype='application/json')
+
+        cursor_f1 = self.get_curve_old('tg_f1', start, end, cups)
+        cursor_p1 = self.get_curve_old('tg_p1', start, end, cups)
+        result = self.ordered_merge(cursor_f1, cursor_p1)
+
+        return Response(json.dumps(result), mimetype='application/json')
+
+    def get_curve_old(self, curve_type, start, end, cups):
         search_query = {
             'name': {'$regex': '^{}'.format(cups[:20])},
             'datetime': {'$gte': start, '$lt': end}
         }
-        p1_search_query = {
-            'name': {'$regex': '^{}'.format(cups[:20])},
-            'datetime': {'$gte': start, '$lt': end},
-            'type': P1_CURVE_TYPE
-        }
+        if curve_type == 'tg_p1':
+            search_query.update(type = P1_CURVE_TYPE)
 
-        result = []
-        cursor_f5d = self.get_curve('tg_cchfact', start, end, cups)
-        if self._query_result_length(cursor_f5d) > 0:
-            result = [self._curve_value(curve, WATT) for curve in cursor_f5d]
-            return Response(json.dumps(result), mimetype='application/json')
-
-        cursor_f1 = self.get_cursor_db(collection='tg_f1', query=search_query)
-        cursor_p1 = self.get_cursor_db(collection='tg_p1', query=p1_search_query)
-        if self._query_result_length(cursor_f1) > 0 \
-                or self._query_result_length(cursor_p1) > 0:
-            result = self.ordered_merge(cursor_f1, cursor_p1)
-
-        return Response(json.dumps(result), mimetype='application/json')
+        cursor = self.get_cursor_db(collection=curve_type, query=search_query)
+        return (x for x in cursor)
 
     def get_curve(self, curve_type, start, end, cups):
         repository = self.create_repository(curve_type)
@@ -137,7 +136,7 @@ class CCHFact(CCHResource):
         # curve_type_backends = config.CURVE_TYPE_BACKENDS
         curve_type_backends = {
             'tg_cchfact': 'mongo',
-            'tg_f1': 'timescale'
+            'tg_f1': 'mongo'
         }
         # backend_name = curve_type_backends.get(
         #     curve_type, config.CURVE_TYPE_DEFAULT_BACKEND

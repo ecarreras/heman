@@ -63,22 +63,23 @@ class TestCchRequest(object):
         ))
 
     def test_no_curves_data(self, http_client, yaml_snapshot):
+        no_results_date = 200001 # This date is so ancient there is no curves yet
+
         token = tg_cchfact_NOT_existing_points_BUT_f1['token']
         cups = tg_cchfact_NOT_existing_points_BUT_f1['cups']
         date = tg_cchfact_NOT_existing_points_BUT_f1['date']
         endpoint_url = '/api/CCHFact/{cups}/{date}'.format(
             cups=cups,
-            date=date
+            date=no_results_date,
         )
         headers = dict(
             Authorization='token {token}'.format(token=token)
         )
 
-        with patch.object(CCHFact, '_query_result_length', return_value=0):
-            response = http_client.get(
-                endpoint_url,
-                headers=headers
-            )
+        response = http_client.get(
+            endpoint_url,
+            headers=headers
+        )
 
         yaml_snapshot(ns(
             status=response.status,
