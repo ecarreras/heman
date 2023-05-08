@@ -14,6 +14,7 @@ from heman.app import application
 from heman.api.cch import CCHFact
 from heman.api.cch import TgCchF1Repository
 from heman.api.cch.mongo_curve_backend import MongoCurveBackend
+from heman.api.cch.timescale_curve_backend import TimescaleCurveBackend
 
 
 @pytest.fixture()
@@ -101,15 +102,18 @@ def get_mongo_instance():
 class TestMongoCurveBackend(object):
     def test_get_curve_f1_foo(self, yaml_snapshot):
 
-        mongo_curve_backend = MongoCurveBackend(get_mongo_instance())
+        backend = TimescaleCurveBackend()
+        #backend = MongoCurveBackend(get_mongo_instance())
 
-        result = mongo_curve_backend.get_curve(
-            curve_type=TgCchF1Repository(mongo_curve_backend),
-            start=localisodate('2019-09-21'),
-            end=localisodate('2019-09-22'),
+        from heman.api.cch.datetimeutils import as_naive
+        result = backend.get_curve(
+            curve_type=TgCchF1Repository(backend),
+            start=as_naive(localisodate('2019-09-21')),
+            end=as_naive(localisodate('2019-09-22')),
 
             cups=tg_cchfact_NOT_existing_points_BUT_f1['cups'],
         )
+
 
         yaml_snapshot(ns(
             result=[x for x in result]

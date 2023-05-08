@@ -3,6 +3,9 @@ from heman.erpdb_manager import get_timescale_connection
 from somutils.dbutils import fetchNs
 from somutils.isodates import toLocal, asUtc
 
+from .datetimeutils import as_naive
+
+
 class TimescaleCurveBackend:
     def __init__(self):
         self.db_connection = get_timescale_connection()
@@ -17,8 +20,8 @@ class TimescaleCurveBackend:
 
 
         def from_naive_localdate_to_naiveutc_datetime(naive_localdate):
-            return asUtc(toLocal(naive_localdate)).replace(tzinfo=None)
-            #return naive_localdate
+            return asUtc(toLocal(as_naive(naive_localdate))).replace(tzinfo=None)
+
 
         result = []
         with self.db_connection as connection:
@@ -31,6 +34,7 @@ class TimescaleCurveBackend:
                 result += [cursor.mogrify("utc_timestamp < %s", [from_naive_localdate_to_naiveutc_datetime(end)])]
             for key, value in extra_filter.items():
                 result += [cursor.mogrify("{key} = %s".format(key=key), [value])]
+
         return result
 
     def get_curve(self, curve_type, start, end, cups=None):
@@ -43,7 +47,7 @@ class TimescaleCurveBackend:
         with self.db_connection as connection:
             cursor = connection.cursor()
             cursor.execute("""
-                SELECT * from {model}
+                SELECT ai, datetime, COALESCE(season,0) AS season FROM {model}
                 {where_clause}
                 ORDER BY utc_timestamp
                 ;

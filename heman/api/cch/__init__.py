@@ -10,6 +10,7 @@ from heman.api import AuthorizedResource
 from heman.auth import check_cups_allowed
 from heman.config import mongo
 
+from .datetimeutils import to_local, as_naive, utc_timestamp_ms
 from .mongo_curve_backend import MongoCurveBackend
 from .timescale_curve_backend import TimescaleCurveBackend
 
@@ -60,8 +61,9 @@ class CCHFact(CCHResource):
         )
 
     def _curve_value(self, curve, unit):
+        date = utc_timestamp_ms(to_local(as_naive(curve['datetime']), curve['season']))
         return {
-            'date': time.mktime((curve['datetime']).timetuple()) * 1000,
+            'date': date,
             'value': curve['ai'] * 1000 if unit == KILOWATT else curve['ai']
         }
 
@@ -106,7 +108,9 @@ class CCHFact(CCHResource):
 
         result = []
         cursor_f5d = self.get_curve('tg_cchfact', start, end, cups)
+
         result = [self._curve_value(curve, WATT) for curve in cursor_f5d]
+
         if result:
             return Response(json.dumps(result), mimetype='application/json')
 
@@ -136,7 +140,7 @@ class CCHFact(CCHResource):
         # curve_type_backends = config.CURVE_TYPE_BACKENDS
         curve_type_backends = {
             'tg_cchfact': 'mongo',
-            'tg_f1': 'mongo'
+            'tg_f1': 'timescale'
         }
         # backend_name = curve_type_backends.get(
         #     curve_type, config.CURVE_TYPE_DEFAULT_BACKEND
