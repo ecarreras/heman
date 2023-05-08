@@ -21,9 +21,15 @@ class MongoCurveBackend:
         **extra_filter
     ):
 
+        def naivize(datetime):
+            return datetime.replace(tzinfo=None)
+
         query = {
             'name': {'$regex': '^{}'.format(cups[:20])},
-            'datetime': {'$gte': start, '$lt': end}
+            # KLUDGE: datetime is naive but is stored in mongo as UTC,
+            # if we pass dates as local, we will be comparing to the equivalent
+            # UTC date which is wrong, so we remove the timezone to make them naive
+            'datetime': {'$gte': naivize(start), '$lt': naivize(end)}
         }
 
         return query
