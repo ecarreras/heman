@@ -8,6 +8,8 @@ from testdata.curves import (
 )
 
 from yamlns import ns
+from yamlns.pytestutils import assert_ns_equal
+
 from somutils.isodates import localisodate
 
 from heman.app import application
@@ -92,6 +94,7 @@ class TestCchRequest(object):
             json=response.json,
         ))
 
+
 def get_mongo_instance():
     f = get_mongo_instance
     if not hasattr(f, 'instance'):
@@ -99,18 +102,15 @@ def get_mongo_instance():
         f.instance = MongoClient(os.environ.get('MONGO_URI'))
     return f.instance.somenergia
 
-class TestMongoCurveBackend(object):
-    def test_get_curve_f1_foo(self, yaml_snapshot):
+class TestCurveBackend(object):
+    def test_get_curve_f1_timescale(self, yaml_snapshot):
 
         backend = TimescaleCurveBackend()
-        #backend = MongoCurveBackend(get_mongo_instance())
 
-        from heman.api.cch.datetimeutils import as_naive
         result = backend.get_curve(
             curve_type=TgCchF1Repository(backend),
-            start=as_naive(localisodate('2019-09-21')),
-            end=as_naive(localisodate('2019-09-22')),
-
+            start=localisodate('2019-09-21'),
+            end=localisodate('2019-09-22'),
             cups=tg_cchfact_NOT_existing_points_BUT_f1['cups'],
         )
 
@@ -118,4 +118,37 @@ class TestMongoCurveBackend(object):
         yaml_snapshot(ns(
             result=[x for x in result]
         ))
+
+    def test_get_curve_f1_mongo(self, yaml_snapshot):
+        backend = MongoCurveBackend(get_mongo_instance())
+
+        result = backend.get_curve(
+            curve_type=TgCchF1Repository(backend),
+            start=localisodate('2019-09-21'),
+            end=localisodate('2019-09-22'),
+            cups=tg_cchfact_NOT_existing_points_BUT_f1['cups'],
+        )
+
+
+        yaml_snapshot(ns(
+            result=[x for x in result]
+        ))
+
+    def test_get_curve_f1_mongo_and_timescale_equal(self, yaml_snapshot):
+        backend_mongo = MongoCurveBackend(get_mongo_instance())
+        backend_timescale = TimescaleCurveBackend()
+
+        result_mongo, result_timescale = [
+            backend.get_curve(
+                curve_type=TgCchF1Repository(backend),
+                start=localisodate('2019-09-21'),
+                end=localisodate('2019-09-22'),
+                cups=tg_cchfact_NOT_existing_points_BUT_f1['cups'],
+            )
+            for backend in (backend_mongo, backend_timescale)
+        ]
+        assert_ns_equal(
+            ns(result=list(result_mongo)),
+            ns(result=list(result_timescale)),
+        )
 
