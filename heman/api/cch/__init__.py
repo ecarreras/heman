@@ -49,23 +49,6 @@ class CCHResource(AuthorizedResource):
 
 WATT = 'W'
 KILOWATT = 'kW'
-P1_CURVE_TYPE = 'p'
-
-def get_curve_old(curve_type, start, end, cups, mongodb=None):
-    mongodb = mongodb or mongo.db
-    search_query = {
-        'name': {'$regex': '^{}'.format(cups[:20])},
-        'datetime': {'$gte': start, '$lt': end}
-    }
-    if curve_type == 'tg_p1':
-        search_query.update(type = P1_CURVE_TYPE)
-
-   # cursor = get_cursor_db(collection=curve_type, query=search_query)
-    return (x for x in mongodb[curve_type].find(
-        search_query,
-        fields={'_id': False, 'datetime': True, 'ai': True}).sort(
-        'datetime', ASCENDING
-    ))
 
 
 class CCHFact(CCHResource):

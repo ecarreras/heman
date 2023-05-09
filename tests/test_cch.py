@@ -13,7 +13,6 @@ from yamlns.pytestutils import assert_ns_equal
 from somutils.isodates import localisodate
 
 from heman.app import application
-from heman.api.cch import get_curve_old
 from heman.api.cch import TgCchF1Repository, TgCchP1Repository
 from heman.api.cch.mongo_curve_backend import MongoCurveBackend
 from heman.api.cch.timescale_curve_backend import TimescaleCurveBackend
