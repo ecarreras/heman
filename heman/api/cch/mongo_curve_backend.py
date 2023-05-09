@@ -45,5 +45,9 @@ class MongoCurveBackend:
         result = self.get_cursor_db(curve_type.model, query)
 
         for x in result:
-            yield dict(x, ai=float(x['ai']))
+            yield dict(
+                x,
+                datetime=as_naive(x['datetime']),
+                ai=float(x['ai']),
+            )
 
