@@ -51,7 +51,7 @@ class TestCchRequest(object):
     def test_tg_cchfact_NOT_existing_points_BUT_f1(self, http_client, yaml_snapshot):
         token = tg_cchfact_NOT_existing_points_BUT_f1['token']
         cups = tg_cchfact_NOT_existing_points_BUT_f1['cups']
-        date = tg_cchfact_NOT_existing_points_BUT_f1['date']
+        date = '202009'
         endpoint_url = '/api/CCHFact/{cups}/{date}'.format(
             cups=cups,
             date=date
@@ -109,8 +109,8 @@ class TestCurveBackend(object):
 
         result = backend.get_curve(
             curve_type=TgCchF1Repository(backend),
-            start=localisodate('2019-09-21'),
-            end=localisodate('2019-09-22'),
+            start=localisodate('2019-10-01'),
+            end=localisodate('2019-10-02'),
             cups=tg_cchfact_NOT_existing_points_BUT_f1['cups'],
         )
 
@@ -124,8 +124,8 @@ class TestCurveBackend(object):
 
         result = backend.get_curve(
             curve_type=TgCchF1Repository(backend),
-            start=localisodate('2019-09-21'),
-            end=localisodate('2019-09-22'),
+            start=localisodate('2019-10-01'),
+            end=localisodate('2019-10-02'),
             cups=tg_cchfact_NOT_existing_points_BUT_f1['cups'],
         )
 
@@ -141,8 +141,8 @@ class TestCurveBackend(object):
         result_mongo, result_timescale = [
             backend.get_curve(
                 curve_type=TgCchF1Repository(backend),
-                start=localisodate('2019-09-21'),
-                end=localisodate('2019-09-22'),
+                start=localisodate('2019-10-01'),
+                end=localisodate('2019-10-02'),
                 cups=tg_cchfact_NOT_existing_points_BUT_f1['cups'],
             )
             for backend in (backend_mongo, backend_timescale)
