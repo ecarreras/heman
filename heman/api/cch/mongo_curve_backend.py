@@ -35,6 +35,8 @@ class MongoCurveBackend:
             'datetime': {'$gte': as_naive(start), '$lt': as_naive(end)}
         }
 
+        query.update(extra_filter)
+
         return query
 
     def get_curve(self, curve_type, start, end, cups=None):

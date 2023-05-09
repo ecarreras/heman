@@ -13,8 +13,8 @@ from yamlns.pytestutils import assert_ns_equal
 from somutils.isodates import localisodate
 
 from heman.app import application
-from heman.api.cch import CCHFact
-from heman.api.cch import TgCchF1Repository
+from heman.api.cch import get_curve_old
+from heman.api.cch import TgCchF1Repository, TgCchP1Repository
 from heman.api.cch.mongo_curve_backend import MongoCurveBackend
 from heman.api.cch.timescale_curve_backend import TimescaleCurveBackend
 
@@ -151,4 +151,17 @@ class TestCurveBackend(object):
             ns(result=list(result_mongo)),
             ns(result=list(result_timescale)),
         )
+
+    def test_get_curve_p1_mongo(self, yaml_snapshot):
+        backend = MongoCurveBackend(get_mongo_instance())
+        result = backend.get_curve(
+            curve_type=TgCchP1Repository(backend),
+            start=localisodate('2019-10-01'),
+            end=localisodate('2019-10-02'),
+            cups=tg_cchfact_NOT_existing_points_BUT_f1['cups'],
+        )
+
+        yaml_snapshot(ns(
+            result=list(result)
+        ))
 

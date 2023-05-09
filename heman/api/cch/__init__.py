@@ -35,6 +35,7 @@ class TgCchF1Repository(CurveRepository):
 
 class TgCchP1Repository(CurveRepository):
     model = 'tg_p1'
+    extra_filter = dict(type='p')
 
 
 class CCHResource(AuthorizedResource):
@@ -50,15 +51,24 @@ WATT = 'W'
 KILOWATT = 'kW'
 P1_CURVE_TYPE = 'p'
 
+def get_curve_old(curve_type, start, end, cups, mongodb=None):
+    mongodb = mongodb or mongo.db
+    search_query = {
+        'name': {'$regex': '^{}'.format(cups[:20])},
+        'datetime': {'$gte': start, '$lt': end}
+    }
+    if curve_type == 'tg_p1':
+        search_query.update(type = P1_CURVE_TYPE)
+
+   # cursor = get_cursor_db(collection=curve_type, query=search_query)
+    return (x for x in mongodb[curve_type].find(
+        search_query,
+        fields={'_id': False, 'datetime': True, 'ai': True}).sort(
+        'datetime', ASCENDING
+    ))
+
 
 class CCHFact(CCHResource):
-
-    def get_cursor_db(self, collection, query):
-        return mongo.db[collection].find(
-            query,
-            fields={'_id': False, 'datetime': True, 'ai': True}).sort(
-            'datetime', ASCENDING
-        )
 
     def _curve_value(self, curve, unit):
         date = utc_timestamp_ms(to_local(as_naive(curve['datetime']), curve['season']))
@@ -115,21 +125,11 @@ class CCHFact(CCHResource):
             return Response(json.dumps(result), mimetype='application/json')
 
         cursor_f1 = self.get_curve('tg_f1', start, end, cups)
-        cursor_p1 = self.get_curve_old('tg_p1', start, end, cups)
+        cursor_p1 = get_curve_old('tg_p1', start, end, cups)
         result = self.ordered_merge(cursor_f1, cursor_p1)
 
         return Response(json.dumps(result), mimetype='application/json')
 
-    def get_curve_old(self, curve_type, start, end, cups):
-        search_query = {
-            'name': {'$regex': '^{}'.format(cups[:20])},
-            'datetime': {'$gte': start, '$lt': end}
-        }
-        if curve_type == 'tg_p1':
-            search_query.update(type = P1_CURVE_TYPE)
-
-        cursor = self.get_cursor_db(collection=curve_type, query=search_query)
-        return (x for x in cursor)
 
     def get_curve(self, curve_type, start, end, cups):
         repository = self.create_repository(curve_type)
