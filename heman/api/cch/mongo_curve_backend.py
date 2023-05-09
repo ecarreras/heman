@@ -42,4 +42,6 @@ class MongoCurveBackend:
 
         result = self.get_cursor_db(curve_type.model, query)
 
-        return result
+        for x in result:
+            yield dict(x, ai=float(x['ai']))
+
