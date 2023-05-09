@@ -125,7 +125,7 @@ class CCHFact(CCHResource):
             return Response(json.dumps(result), mimetype='application/json')
 
         cursor_f1 = self.get_curve('tg_f1', start, end, cups)
-        cursor_p1 = get_curve_old('tg_p1', start, end, cups)
+        cursor_p1 = self.get_curve('tg_p1', start, end, cups)
         result = self.ordered_merge(cursor_f1, cursor_p1)
 
         return Response(json.dumps(result), mimetype='application/json')
