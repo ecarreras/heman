@@ -123,7 +123,8 @@ class CCHFact(CCHResource):
         # TODO: Move to config
         curve_type_backends = {
             'tg_cchfact': 'mongo',
-            'tg_f1': 'mongo'
+            'tg_f1': 'timescale',
+            'tg_p1': 'mongo'
         }
         # TODO: Move to config
         DEFAULT_BACKEND = 'mongo'
