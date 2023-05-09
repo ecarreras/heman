@@ -1,5 +1,5 @@
 from heman.config import mongo
-from pymongo import ASCENDING
+from pymongo import ASCENDING, DESCENDING
 
 from .datetimeutils import as_naive
 
@@ -11,9 +11,13 @@ class MongoCurveBackend:
     def get_cursor_db(self, collection, query):
         return self._mongodb[collection].find(
             query,
-            fields={'_id': False, 'datetime': True, 'season': True, 'ai': True}).sort(
-            'datetime', ASCENDING
-        )
+            fields={'_id': False, 'datetime': True, 'season': True, 'ai': True},
+        ).sort([
+            ('datetime', ASCENDING),
+            # Sorting dupped times when changing from
+            # summer (season=1) to winter (season=0)
+            ('season', DESCENDING),
+        ])
 
     def build_query(
         self,
