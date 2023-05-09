@@ -64,7 +64,7 @@ class CCHFact(CCHResource):
         date = utc_timestamp_ms(to_local(as_naive(curve['datetime']), curve['season']))
         return {
             'date': date,
-            'value': curve['ai'] * 1000 if unit == KILOWATT else curve['ai']
+            'value': curve['ai'] * 1000. if unit == KILOWATT else curve['ai']
         }
 
     def ordered_merge(self, cursor_f1, cursor_p1):
