@@ -137,16 +137,15 @@ class CCHFact(CCHResource):
 
     def create_repository(self, curve_type):
         CurveType = curve_types[curve_type]
-        # curve_type_backends = config.CURVE_TYPE_BACKENDS
+        # TODO: Move to config
         curve_type_backends = {
             'tg_cchfact': 'mongo',
-            'tg_f1': 'timescale'
+            'tg_f1': 'mongo'
         }
-        # backend_name = curve_type_backends.get(
-        #     curve_type, config.CURVE_TYPE_DEFAULT_BACKEND
-        # )
+        # TODO: Move to config
+        DEFAULT_BACKEND = 'mongo'
         backend_name = curve_type_backends.get(
-            curve_type, 'mongo'
+            curve_type, DEFAULT_BACKEND,
         )
         Backend = curve_backends[backend_name]
         return CurveType(Backend())
