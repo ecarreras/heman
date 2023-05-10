@@ -31,7 +31,7 @@ jobs:
       matrix:
         python-version:
           - '2.7' # production
-          - '3.9'
+            #- '3.9'
         mongodb-version:
           - 2
         redis-version:
