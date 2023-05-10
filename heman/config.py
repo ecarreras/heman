@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 import logging
 import os
+import json
 
 from flask import Flask
 from flask_pymongo import PyMongo
@@ -45,12 +46,19 @@ def create_app(**config):
     app.config['LOG_LEVEL'] = 'DEBUG'
     app.config['SECRET_KEY'] = '2205552d13b5431bb537732bbb051f1214414f5ab34d47'
 
+    app.config['DEFAULT_CURVE_BACKEND'] = os.environ.get('DEFAULT_CURVE_BACKEND', 'mongo')
+    app.config['CURVE_BACKENDS'] = json.loads(os.environ.get('CURVE_BACKENDS', "null"))
+    if app.config['CURVE_BACKENDS'] is None:
+        app.config['CURVE_BACKENDS'] = dict(
+            tg_f1='timescale',
+        )
+
     configure_logging(app)
     configure_sentry(app)
     configure_api(app)
     configure_mongodb(app)
     configure_login(app)
-    
+
     for route in app.url_map.iter_rules():
         print(route)
 
