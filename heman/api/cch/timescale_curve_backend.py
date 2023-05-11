@@ -55,4 +55,6 @@ class TimescaleCurveBackend:
                 model=curve_type.model,
                 where_clause=where_clause,
             ))
+
             return fetchNs(cursor)
+

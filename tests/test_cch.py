@@ -1,7 +1,6 @@
 import os
 
 import pytest
-from mock import patch
 from testdata.curves import (
     tg_cchfact_existing_points,
     tg_cchfact_NOT_existing_points_BUT_f1,
@@ -99,6 +98,7 @@ def get_mongo_instance():
         f.instance = MongoClient(os.environ.get('MONGO_URI'))
     return f.instance.somenergia
 
+
 class TestCurveBackend(object):
     def test_get_curve_f1_timescale(self, yaml_snapshot):
 
@@ -110,7 +110,6 @@ class TestCurveBackend(object):
             end=localisodate('2019-10-02'),
             cups=tg_cchfact_NOT_existing_points_BUT_f1['cups'],
         )
-
 
         yaml_snapshot(ns(
             result=[x for x in result]
@@ -125,7 +124,6 @@ class TestCurveBackend(object):
             end=localisodate('2019-10-02'),
             cups=tg_cchfact_NOT_existing_points_BUT_f1['cups'],
         )
-
 
         yaml_snapshot(ns(
             result=[x for x in result]
@@ -144,6 +142,7 @@ class TestCurveBackend(object):
             )
             for backend in (backend_mongo, backend_timescale)
         ]
+
         assert_ns_equal(
             ns(result=list(result_mongo)),
             ns(result=list(result_timescale)),
@@ -161,4 +160,3 @@ class TestCurveBackend(object):
         yaml_snapshot(ns(
             result=list(result)
         ))
-
