@@ -10,7 +10,7 @@ with open('README.md', 'r') as desc:
 
 setup(
     name='heman',
-    version='1.1.4',
+    version='1.2.0',
     description="Uses the Empowering Sword (a.k.a Empowering Proxy API for users)",
     packages=find_packages(),
     url='https://github.com/gisce/heman',
