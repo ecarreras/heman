@@ -13,6 +13,7 @@ setup(
     version='1.2.0',
     description="Uses the Empowering Sword (a.k.a Empowering Proxy API for users)",
     packages=find_packages(),
+    package_data={'': ['requirements.txt']},
     url='https://github.com/gisce/heman',
     long_description = readme,
     long_description_content_type = 'text/markdown', 
