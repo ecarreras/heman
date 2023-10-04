@@ -33,6 +33,6 @@ flask-restful>=0.3.1,<0.4.0
 raven<5.2.0
 blinker
 flask-login<0.3.0
-flask-cors
+flask-cors<4 # Py2
 yamlns>=0.10.0 # yaml_snapshot introduced in this version
 
