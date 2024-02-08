@@ -4,6 +4,7 @@ import pytest
 from testdata.curves import (
     tg_cchfact_existing_points,
     tg_cchfact_NOT_existing_points_BUT_f1,
+    tg_cchfact_p1_repeated_records,
 )
 
 from yamlns import ns
@@ -159,4 +160,31 @@ class TestCurveBackend(object):
 
         yaml_snapshot(ns(
             result=list(result)
+        ))
+
+    def test_get_curve_p1_mongo_repeated_records(self, yaml_snapshot):
+        backend = MongoCurveBackend(get_mongo_instance())
+        result = backend.get_curve(
+            curve_type=TgCchP1Repository(backend),
+            start=localisodate('2024-01-06'),
+            end=localisodate('2024-01-07'),
+            cups=tg_cchfact_p1_repeated_records['cups'],
+        )
+
+        yaml_snapshot(ns(
+            result=list(result)
+        ))
+
+    def test_get_curve_p1_timescale_repeated_records(self, yaml_snapshot):
+        backend = TimescaleCurveBackend()
+
+        result = backend.get_curve(
+            curve_type=TgCchP1Repository(backend),
+            start=localisodate('2024-01-06'),
+            end=localisodate('2024-01-07'),
+            cups=tg_cchfact_p1_repeated_records['cups'],
+        )
+
+        yaml_snapshot(ns(
+            result=[x for x in result]
         ))

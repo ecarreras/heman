@@ -9,15 +9,9 @@ class MongoCurveBackend:
         self._mongodb = mongodb or mongo.db
 
     def get_cursor_db(self, collection, query):
-        return self._mongodb[collection].find(
-            query,
-            fields={'_id': False, 'datetime': True, 'season': True, 'ai': True},
-        ).sort([
-            ('datetime', ASCENDING),
-            # Sorting dupped times when changing from
-            # summer (season=1) to winter (season=0)
-            ('season', DESCENDING),
-        ])
+        return self._mongodb[collection].aggregate(
+            query
+        )['result']
 
     def build_query(
         self,
@@ -27,7 +21,7 @@ class MongoCurveBackend:
         **extra_filter
     ):
 
-        query = {
+        match_query = {
             'name': {'$regex': '^{}'.format(cups[:20])},
             # KLUDGE: datetime is naive but is stored in mongo as UTC,
             # if we pass dates as local, we will be comparing to the equivalent
@@ -35,7 +29,24 @@ class MongoCurveBackend:
             'datetime': {'$gte': as_naive(start), '$lt': as_naive(end)}
         }
 
-        query.update(extra_filter)
+        match_query.update(extra_filter)
+
+        query = [
+            {'$match': match_query },
+            {'$group': {'_id': {'datetime': '$datetime', 'name': '$name'},
+                        'datetime': {'$first': '$datetime'},
+                        'ai': {'$first': '$ai'},
+                        'season': {'$first': '$season'},
+                        }
+            },
+            {'$sort': {
+                    'datetime': ASCENDING,
+                    # Sorting dupped times when changing from
+                    # summer (season=1) to winter (season=0)
+                    'season': DESCENDING
+                    }
+            }
+        ]
 
         return query
 
@@ -46,7 +57,7 @@ class MongoCurveBackend:
 
         for x in result:
             yield dict(
-                x,
+                season=x['season'],
                 datetime=as_naive(x['datetime']),
                 ai=float(x['ai']),
             )
